@@ -1,0 +1,6 @@
+{
+  "name": "PocketCode",
+  "description": "Mobile multi-file IDE & code runner with package manager, Telegram bot templates, customizable syntax highlighting, and GitHub Actions APK build integration.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
