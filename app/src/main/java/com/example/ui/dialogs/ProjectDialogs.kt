@@ -27,7 +27,7 @@ fun CreateFileDialog(
     var selectedTemplate by remember { mutableStateOf("blank") }
 
     val templates = listOf(
-        Triple("blank", "Пустой файл", "# Модуль проекта\n"),
+        Triple("blank", "Пустой файл (чистый лист)", ""),
         Triple(
             "handler",
             "Модуль обработчиков (handlers.py)",

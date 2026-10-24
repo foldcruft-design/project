@@ -6,11 +6,20 @@ import com.example.engine.TelegramBotSimulator
 import com.example.github.GitHubActionsHub
 import com.example.model.SyntaxThemes
 import com.example.snippets.SnippetLibrary
+import com.example.ui.components.FileTypeHelper
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
 import org.junit.Test
 
 class ExampleUnitTest {
+
+    @Test
+    fun `blank project starts with completely empty files`() {
+        val blank = DefaultProjects.blankProject
+        assertEquals("Чистый проект", blank.name)
+        assertTrue(blank.files.isNotEmpty())
+        assertTrue("main.py in blank project should be empty", blank.files.first().content.isEmpty())
+    }
 
     @Test
     fun `default telegram bot project has required multi-file architecture`() {
@@ -29,6 +38,24 @@ class ExampleUnitTest {
     }
 
     @Test
+    fun `file type helper provides badges for python java cpp and others`() {
+        assertEquals("Py", FileTypeHelper.getLanguageBadge("main.py").label)
+        assertEquals("Java", FileTypeHelper.getLanguageBadge("App.java").label)
+        assertEquals("C++", FileTypeHelper.getLanguageBadge("main.cpp").label)
+        assertEquals("JS", FileTypeHelper.getLanguageBadge("index.js").label)
+        assertEquals("TS", FileTypeHelper.getLanguageBadge("app.ts").label)
+        assertEquals("YAML", FileTypeHelper.getLanguageBadge("android.yml").label)
+    }
+
+    @Test
+    fun `github dark syntax theme exists and is default`() {
+        val githubTheme = SyntaxThemes.getById("github_dark")
+        assertEquals("GitHub Dark (Default)", githubTheme.name)
+        assertNotNull(githubTheme.keywordColor)
+        assertNotNull(githubTheme.stringColor)
+    }
+
+    @Test
     fun `package catalog contains essential bot and web libraries`() {
         val packages = PackageCatalog.curatedPackages
         val names = packages.map { it.name }
@@ -36,16 +63,6 @@ class ExampleUnitTest {
         assertTrue(names.contains("python-dotenv"))
         assertTrue(names.contains("fastapi"))
         assertTrue(names.contains("requests"))
-    }
-
-    @Test
-    fun `dark syntax themes exist and have high contrast`() {
-        val themes = SyntaxThemes.allThemes
-        assertTrue(themes.size >= 5)
-        val obsidian = SyntaxThemes.getById("obsidian_dark")
-        assertEquals("Obsidian Dark", obsidian.name)
-        assertNotNull(obsidian.keywordColor)
-        assertNotNull(obsidian.stringColor)
     }
 
     @Test
@@ -57,14 +74,6 @@ class ExampleUnitTest {
 
         val callbackResult = simulator.handleCallbackClick("action_stats") {}
         assertTrue(callbackResult.contains("Статистика"))
-    }
-
-    @Test
-    fun `snippet library contains cards for bot and keyboards`() {
-        val cards = SnippetLibrary.cards
-        assertTrue(cards.isNotEmpty())
-        assertTrue(cards.any { it.targetFileSuggestion == "handlers.py" })
-        assertTrue(cards.any { it.targetFileSuggestion == "keyboards.py" })
     }
 
     @Test

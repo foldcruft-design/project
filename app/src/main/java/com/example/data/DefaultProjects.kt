@@ -315,5 +315,38 @@ pydantic==2.6.4
         )
     }
 
-    val defaultProjects = listOf(telegramBotProject, fastApiProject)
+    val blankProject: Project by lazy {
+        val projId = "proj_blank"
+        val mainFileId = "file_blank_main"
+        val utilsFileId = "file_blank_utils"
+
+        val mainPy = CodeFile(
+            id = mainFileId,
+            projectId = projId,
+            name = "main.py",
+            isEntrypoint = true,
+            content = ""
+        )
+
+        val utilsPy = CodeFile(
+            id = utilsFileId,
+            projectId = projId,
+            name = "utils.py",
+            isEntrypoint = false,
+            content = ""
+        )
+
+        Project(
+            id = projId,
+            name = "Чистый проект",
+            description = "Изначально пустые файлы для свободного программирования",
+            language = "python",
+            activeFileId = mainFileId,
+            files = listOf(mainPy, utilsPy),
+            installedPackages = emptyList()
+        )
+    }
+
+    val defaultProjects = listOf(blankProject, telegramBotProject, fastApiProject)
 }
+

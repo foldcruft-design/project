@@ -214,7 +214,7 @@ fun FileExplorerSheet(
                                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                                 modifier = Modifier.weight(1f)
                             ) {
-                                Icon(icon, contentDescription = null, tint = if (isActive) TextPrimary else TextMuted, modifier = Modifier.size(20.dp))
+                                com.example.ui.components.FileLanguageIcon(file.name)
                                 Column {
                                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                                         Text(

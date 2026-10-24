@@ -72,6 +72,22 @@ data class SyntaxTheme(
 )
 
 object SyntaxThemes {
+    val GitHubDark = SyntaxTheme(
+        id = "github_dark",
+        name = "GitHub Dark (Default)",
+        editorBackground = Color(0xFF0D1117),
+        lineNumbersColor = Color(0xFF6E7681),
+        cursorColor = Color(0xFF58A6FF),
+        keywordColor = Color(0xFFFF7B72),
+        stringColor = Color(0xFFA5D6FF),
+        functionColor = Color(0xFFD2A8FF),
+        numberColor = Color(0xFF79C0FF),
+        commentColor = Color(0xFF8B949E),
+        decoratorColor = Color(0xFFD2A8FF),
+        operatorColor = Color(0xFF79C0FF),
+        variableColor = Color(0xFFF0F6FC)
+    )
+
     val ObsidianDark = SyntaxTheme(
         id = "obsidian_dark",
         name = "Obsidian Dark",
@@ -136,29 +152,13 @@ object SyntaxThemes {
         variableColor = Color(0xFFFAFAFA)
     )
 
-    val SlateDark = SyntaxTheme(
-        id = "slate_dark",
-        name = "Slate Dark",
-        editorBackground = Color(0xFF0E1117),
-        lineNumbersColor = Color(0xFF475569),
-        cursorColor = Color(0xFFF8FAFC),
-        keywordColor = Color(0xFFF1F5F9),
-        stringColor = Color(0xFF94A3B8),
-        functionColor = Color(0xFFE2E8F0),
-        numberColor = Color(0xFFCBD5E1),
-        commentColor = Color(0xFF64748B),
-        decoratorColor = Color(0xFFF8FAFC),
-        operatorColor = Color(0xFF94A3B8),
-        variableColor = Color(0xFFF1F5F9)
-    )
-
-    val allThemes = listOf(ObsidianDark, JetBlackOLED, CharcoalStealth, GraphiteMinimal, SlateDark)
+    val allThemes = listOf(GitHubDark, ObsidianDark, JetBlackOLED, CharcoalStealth, GraphiteMinimal)
     
-    fun getById(id: String): SyntaxTheme = allThemes.find { it.id == id } ?: ObsidianDark
+    fun getById(id: String): SyntaxTheme = allThemes.find { it.id == id } ?: GitHubDark
 }
 
 data class EditorSettings(
-    val themeId: String = "obsidian_dark",
+    val themeId: String = "github_dark",
     val fontSizeSp: Int = 14,
     val showLineNumbers: Boolean = true,
     val wordWrap: Boolean = false,
