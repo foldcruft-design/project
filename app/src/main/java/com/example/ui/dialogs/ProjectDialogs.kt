@@ -42,19 +42,41 @@ fun CreateFileDialog(
             "config",
             "Модуль настроек (config.py)",
             "# Настройки проекта\nimport os\n\nTOKEN = os.getenv('BOT_TOKEN', 'dev_token')\nDEBUG = True\n"
+        ),
+        Triple(
+            "github_action",
+            "GitHub Actions воркфлоу (android.yml)",
+            """name: Android CI - Build APK
+on: [push, workflow_dispatch]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - run: chmod +x gradlew
+      - run: ./gradlew assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: APK
+          path: app/build/outputs/apk/debug/*.apk
+"""
         )
     )
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = IdeSurface,
+        containerColor = DarkSurface,
         title = {
             Text("Новый файл проекта", color = TextPrimary, fontWeight = FontWeight.Bold)
         },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text(
-                    "Укажите имя файла (например, handlers.py, utils.py или .env):",
+                    "Укажите имя файла (например, handlers.py, utils.py или android.yml):",
                     color = TextSecondary,
                     fontSize = 13.sp
                 )
@@ -62,18 +84,20 @@ fun CreateFileDialog(
                 OutlinedTextField(
                     value = fileName,
                     onValueChange = { fileName = it },
-                    placeholder = { Text("my_module.py") },
+                    placeholder = { Text("my_module.py", color = TextMuted) },
                     singleLine = true,
                     modifier = Modifier
                         .fillMaxWidth()
                         .testTag("new_file_name_input"),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = CyanAccent,
-                        unfocusedBorderColor = IdeBorder,
+                        focusedBorderColor = TextPrimary,
+                        unfocusedBorderColor = DarkBorder,
                         focusedTextColor = TextPrimary,
-                        unfocusedTextColor = TextPrimary
+                        unfocusedTextColor = TextPrimary,
+                        focusedContainerColor = DarkSurfaceElevated,
+                        unfocusedContainerColor = DarkSurfaceElevated
                     ),
-                    shape = RoundedCornerShape(10.dp)
+                    shape = RoundedCornerShape(8.dp)
                 )
 
                 Text("ШАБЛОН СОДЕРЖИМОГО:", fontSize = 11.sp, color = TextMuted, fontWeight = FontWeight.Bold)
@@ -81,10 +105,10 @@ fun CreateFileDialog(
                 templates.forEach { (id, label, _) ->
                     Surface(
                         shape = RoundedCornerShape(8.dp),
-                        color = if (selectedTemplate == id) CyanAccentMuted.copy(alpha = 0.3f) else IdeSurfaceVariant,
+                        color = if (selectedTemplate == id) DarkSurfaceHighlight else DarkSurfaceElevated,
                         border = androidx.compose.foundation.BorderStroke(
                             1.dp,
-                            if (selectedTemplate == id) CyanAccent else IdeBorder
+                            if (selectedTemplate == id) TextPrimary else DarkBorder
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
@@ -95,6 +119,7 @@ fun CreateFileDialog(
                                         "handler" -> "handlers.py"
                                         "keyboards" -> "keyboards.py"
                                         "config" -> "config.py"
+                                        "github_action" -> "android.yml"
                                         else -> ""
                                     }
                                 }
@@ -108,7 +133,10 @@ fun CreateFileDialog(
                             RadioButton(
                                 selected = selectedTemplate == id,
                                 onClick = { selectedTemplate = id },
-                                colors = RadioButtonDefaults.colors(selectedColor = CyanAccent)
+                                colors = RadioButtonDefaults.colors(
+                                    selectedColor = TextPrimary,
+                                    unselectedColor = TextMuted
+                                )
                             )
                             Text(label, color = TextPrimary, fontSize = 12.sp)
                         }
@@ -125,11 +153,11 @@ fun CreateFileDialog(
                         onConfirm(trimmed, chosenContent)
                     }
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = CyanAccent, contentColor = IdeBackground),
+                colors = ButtonDefaults.buttonColors(containerColor = TextPrimary, contentColor = DarkBg),
                 enabled = fileName.isNotBlank(),
                 modifier = Modifier.testTag("confirm_create_file_btn")
             ) {
-                Text("Создать файл", fontWeight = FontWeight.Bold)
+                Text("Создать", fontWeight = FontWeight.Bold)
             }
         },
         dismissButton = {
@@ -151,7 +179,7 @@ fun CreateProjectDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = IdeSurface,
+        containerColor = DarkSurface,
         title = {
             Text("Новый мультифайловый проект", color = TextPrimary, fontWeight = FontWeight.Bold)
         },
@@ -160,48 +188,52 @@ fun CreateProjectDialog(
                 OutlinedTextField(
                     value = projectName,
                     onValueChange = { projectName = it },
-                    label = { Text("Название проекта") },
-                    placeholder = { Text("My Telegram Bot") },
+                    label = { Text("Название проекта", color = TextSecondary) },
+                    placeholder = { Text("My Telegram Bot", color = TextMuted) },
                     singleLine = true,
                     modifier = Modifier
                         .fillMaxWidth()
                         .testTag("new_project_name_input"),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = CyanAccent,
-                        unfocusedBorderColor = IdeBorder,
+                        focusedBorderColor = TextPrimary,
+                        unfocusedBorderColor = DarkBorder,
                         focusedTextColor = TextPrimary,
-                        unfocusedTextColor = TextPrimary
+                        unfocusedTextColor = TextPrimary,
+                        focusedContainerColor = DarkSurfaceElevated,
+                        unfocusedContainerColor = DarkSurfaceElevated
                     )
                 )
 
                 OutlinedTextField(
                     value = projectDesc,
                     onValueChange = { projectDesc = it },
-                    label = { Text("Описание (опционально)") },
-                    placeholder = { Text("Бот для заказов с разделением файлов") },
+                    label = { Text("Описание (опционально)", color = TextSecondary) },
+                    placeholder = { Text("Бот для заказов", color = TextMuted) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = CyanAccent,
-                        unfocusedBorderColor = IdeBorder,
+                        focusedBorderColor = TextPrimary,
+                        unfocusedBorderColor = DarkBorder,
                         focusedTextColor = TextPrimary,
-                        unfocusedTextColor = TextPrimary
+                        unfocusedTextColor = TextPrimary,
+                        focusedContainerColor = DarkSurfaceElevated,
+                        unfocusedContainerColor = DarkSurfaceElevated
                     )
                 )
 
                 Text("ШАБЛОН АРХИТЕКТУРЫ:", fontSize = 11.sp, color = TextMuted, fontWeight = FontWeight.Bold)
 
                 listOf(
-                    Pair("telegram", "🤖 Telegram Bot (main.py + handlers.py + keyboards.py + config.py)"),
+                    Pair("telegram", "🤖 Telegram Bot (main.py + handlers.py + keyboards.py + config.py + android.yml)"),
                     Pair("fastapi", "⚡ FastAPI REST (main.py + routes.py + models.py)"),
-                    Pair("blank", "📄 Чистый мультифайловый проект (main.py + utils.py)")
+                    Pair("blank", "📄 Чистый проект (main.py + utils.py)")
                 ).forEach { (id, label) ->
                     Surface(
                         shape = RoundedCornerShape(8.dp),
-                        color = if (selectedTemplate == id) CyanAccentMuted.copy(alpha = 0.3f) else IdeSurfaceVariant,
+                        color = if (selectedTemplate == id) DarkSurfaceHighlight else DarkSurfaceElevated,
                         border = androidx.compose.foundation.BorderStroke(
                             1.dp,
-                            if (selectedTemplate == id) CyanAccent else IdeBorder
+                            if (selectedTemplate == id) TextPrimary else DarkBorder
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
@@ -215,7 +247,10 @@ fun CreateProjectDialog(
                             RadioButton(
                                 selected = selectedTemplate == id,
                                 onClick = { selectedTemplate = id },
-                                colors = RadioButtonDefaults.colors(selectedColor = CyanAccent)
+                                colors = RadioButtonDefaults.colors(
+                                    selectedColor = TextPrimary,
+                                    unselectedColor = TextMuted
+                                )
                             )
                             Text(label, color = TextPrimary, fontSize = 12.sp, lineHeight = 16.sp)
                         }
@@ -231,11 +266,11 @@ fun CreateProjectDialog(
                         onConfirm(trimmedName, projectDesc.trim(), selectedTemplate)
                     }
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = CyanAccent, contentColor = IdeBackground),
+                colors = ButtonDefaults.buttonColors(containerColor = TextPrimary, contentColor = DarkBg),
                 enabled = projectName.isNotBlank(),
                 modifier = Modifier.testTag("confirm_create_project_btn")
             ) {
-                Text("Создать проект", fontWeight = FontWeight.Bold)
+                Text("Создать", fontWeight = FontWeight.Bold)
             }
         },
         dismissButton = {

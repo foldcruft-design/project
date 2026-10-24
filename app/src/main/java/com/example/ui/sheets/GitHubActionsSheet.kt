@@ -40,14 +40,14 @@ fun GitHubActionsSheet(
 ) {
     val context = LocalContext.current
     var selectedTab by remember { mutableStateOf(0) }
-    val tabs = listOf("Сборка APK (.yml)", "Деплой Бота (.yml)", "Пошаговая инструкция")
+    val tabs = listOf("Сборка APK (android.yml)", "Деплой Бота (.yml)", "Инструкция")
 
     val activeWorkflow = if (selectedTab == 0) GitHubActionsHub.androidApkWorkflow else GitHubActionsHub.telegramBotWorkflow
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        containerColor = IdeSurface,
-        dragHandle = { BottomSheetDefaults.DragHandle(color = IdeBorder) }
+        containerColor = DarkSurface,
+        dragHandle = { BottomSheetDefaults.DragHandle(color = DarkBorder) }
     ) {
         Column(
             modifier = Modifier
@@ -62,7 +62,7 @@ fun GitHubActionsSheet(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Icon(Icons.Default.CloudSync, contentDescription = null, tint = CyanAccent)
+                    Icon(Icons.Default.CloudSync, contentDescription = null, tint = TextPrimary)
                     Column {
                         Text(
                             "Сборка APK в GitHub Actions",
@@ -71,7 +71,7 @@ fun GitHubActionsSheet(
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            "Бесплатная облачная компиляция и релиз APK",
+                            "Автоматическая облачная компиляция через android.yml",
                             style = MaterialTheme.typography.bodySmall,
                             color = TextSecondary
                         )
@@ -84,18 +84,20 @@ fun GitHubActionsSheet(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Tab bar
+            // Tab bar (Stealth Dark)
             TabRow(
                 selectedTabIndex = selectedTab,
-                containerColor = IdeSurfaceVariant,
-                contentColor = CyanAccent,
+                containerColor = DarkSurfaceElevated,
+                contentColor = TextPrimary,
                 indicator = { tabPositions ->
                     TabRowDefaults.SecondaryIndicator(
                         Modifier.tabIndicatorOffset(tabPositions[selectedTab]),
-                        color = CyanAccent
+                        color = TextPrimary
                     )
                 },
-                modifier = Modifier.clip(RoundedCornerShape(8.dp))
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .border(1.dp, DarkBorder, RoundedCornerShape(8.dp))
             ) {
                 tabs.forEachIndexed { index, title ->
                     Tab(
@@ -106,7 +108,7 @@ fun GitHubActionsSheet(
                                 title,
                                 fontSize = 12.sp,
                                 fontWeight = if (selectedTab == index) FontWeight.Bold else FontWeight.Normal,
-                                color = if (selectedTab == index) CyanAccent else TextSecondary
+                                color = if (selectedTab == index) TextPrimary else TextSecondary
                             )
                         }
                     )
@@ -124,18 +126,18 @@ fun GitHubActionsSheet(
                 ) {
                     item {
                         Surface(
-                            color = IdeSurfaceVariant,
+                            color = DarkSurfaceElevated,
                             shape = RoundedCornerShape(10.dp),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, CyanAccent.copy(alpha = 0.3f))
+                            border = androidx.compose.foundation.BorderStroke(1.dp, DarkBorder)
                         ) {
                             Row(
                                 modifier = Modifier.padding(12.dp),
                                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Icon(Icons.Default.Info, contentDescription = null, tint = CyanAccent)
+                                Icon(Icons.Default.Info, contentDescription = null, tint = TextSecondary)
                                 Text(
-                                    "GitHub предоставляет 2000 бесплатных минут сборки каждый месяц. Компиляция APK занимает ~2-3 минуты на серверах GitHub.",
+                                    "Файл .github/workflows/android.yml уже готов в корне проекта и в шаблоне. При пуше на GitHub компиляция APK запустится автоматически.",
                                     color = TextPrimary,
                                     fontSize = 12.sp,
                                     lineHeight = 17.sp
@@ -147,26 +149,25 @@ fun GitHubActionsSheet(
                     items(GitHubActionsHub.guideSteps) { step ->
                         Card(
                             shape = RoundedCornerShape(10.dp),
-                            colors = CardDefaults.cardColors(containerColor = IdeSurfaceVariant),
-                            border = CardDefaults.outlinedCardBorder().copy(
-                                brush = androidx.compose.ui.graphics.SolidColor(IdeBorder)
-                            )
+                            colors = CardDefaults.cardColors(containerColor = DarkSurfaceElevated),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, DarkBorder)
                         ) {
                             Row(
                                 modifier = Modifier.padding(14.dp),
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
                                 Surface(
-                                    color = CyanAccent,
+                                    color = DarkSurfaceHighlight,
                                     shape = RoundedCornerShape(20.dp),
+                                    border = androidx.compose.foundation.BorderStroke(1.dp, DarkBorder),
                                     modifier = Modifier.size(28.dp)
                                 ) {
                                     Box(contentAlignment = Alignment.Center) {
                                         Text(
                                             step.number,
-                                            color = IdeBackground,
+                                            color = TextPrimary,
                                             fontWeight = FontWeight.Bold,
-                                            fontSize = 14.sp
+                                            fontSize = 13.sp
                                         )
                                     }
                                 }
@@ -193,15 +194,15 @@ fun GitHubActionsSheet(
                         Button(
                             onClick = {
                                 onAddWorkflowToProject()
-                                Toast.makeText(context, "Воркфлоу .github/workflows/build-apk.yml добавлен!", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "Воркфлоу .github/workflows/android.yml добавлен!", Toast.LENGTH_SHORT).show()
                             },
-                            colors = ButtonDefaults.buttonColors(containerColor = CyanAccent, contentColor = IdeBackground),
-                            shape = RoundedCornerShape(10.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = TextPrimary, contentColor = DarkBg),
+                            shape = RoundedCornerShape(8.dp),
                             modifier = Modifier.fillMaxWidth().height(48.dp).testTag("guide_add_workflow_btn")
                         ) {
                             Icon(Icons.Default.AddCircleOutline, contentDescription = null)
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Добавить воркфлоу в файлы проекта", fontWeight = FontWeight.Bold)
+                            Text("Добавить android.yml в файлы проекта", fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -232,7 +233,7 @@ fun GitHubActionsSheet(
                                 onAddWorkflowToProject()
                                 Toast.makeText(context, "Файл ${activeWorkflow.fileName} создан!", Toast.LENGTH_SHORT).show()
                             },
-                            colors = ButtonDefaults.buttonColors(containerColor = CyanAccent, contentColor = IdeBackground),
+                            colors = ButtonDefaults.buttonColors(containerColor = TextPrimary, contentColor = DarkBg),
                             shape = RoundedCornerShape(8.dp),
                             modifier = Modifier.weight(1f).testTag("add_workflow_to_files_btn")
                         ) {
@@ -246,13 +247,14 @@ fun GitHubActionsSheet(
                                 val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                                 val clip = ClipData.newPlainText("workflow", activeWorkflow.ymlContent)
                                 clipboard.setPrimaryClip(clip)
-                                Toast.makeText(context, "YAML скопирован в буфер обмена!", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "YAML скопирован!", Toast.LENGTH_SHORT).show()
                             },
                             shape = RoundedCornerShape(8.dp),
                             colors = ButtonDefaults.filledTonalButtonColors(
-                                containerColor = IdeSurfaceVariant,
+                                containerColor = DarkSurfaceElevated,
                                 contentColor = TextPrimary
-                            )
+                            ),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, DarkBorder)
                         ) {
                             Icon(Icons.Default.ContentCopy, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(4.dp))
@@ -264,16 +266,16 @@ fun GitHubActionsSheet(
 
                     // Path indicator
                     Surface(
-                        color = IdeBackground,
+                        color = DarkBg,
                         shape = RoundedCornerShape(6.dp),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, IdeBorder)
+                        border = androidx.compose.foundation.BorderStroke(1.dp, DarkBorder)
                     ) {
                         Row(
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
-                            Icon(Icons.Default.Description, contentDescription = null, tint = IndigoAccent, modifier = Modifier.size(14.dp))
+                            Icon(Icons.Default.Description, contentDescription = null, tint = TextSecondary, modifier = Modifier.size(14.dp))
                             Text(activeWorkflow.fileName, color = TextPrimary, fontSize = 11.sp, fontFamily = FontFamily.Monospace)
                         }
                     }
@@ -285,8 +287,8 @@ fun GitHubActionsSheet(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(8.dp))
-                            .background(IdeBackground)
-                            .border(1.dp, IdeBorder, RoundedCornerShape(8.dp))
+                            .background(DarkBg)
+                            .border(1.dp, DarkBorder, RoundedCornerShape(8.dp))
                             .padding(12.dp)
                     ) {
                         Text(

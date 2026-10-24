@@ -54,8 +54,8 @@ fun PackageManagerSheet(
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        containerColor = IdeSurface,
-        dragHandle = { BottomSheetDefaults.DragHandle(color = IdeBorder) }
+        containerColor = DarkSurface,
+        dragHandle = { BottomSheetDefaults.DragHandle(color = DarkBorder) }
     ) {
         Column(
             modifier = Modifier
@@ -70,7 +70,7 @@ fun PackageManagerSheet(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Icon(Icons.Default.Extension, contentDescription = null, tint = CyanAccent)
+                    Icon(Icons.Default.Extension, contentDescription = null, tint = TextPrimary)
                     Column {
                         Text(
                             "Менеджер библиотек (pip)",
@@ -101,18 +101,20 @@ fun PackageManagerSheet(
                 OutlinedTextField(
                     value = customPackageInput,
                     onValueChange = { customPackageInput = it },
-                    placeholder = { Text("Имя пакета (напр. httpx, telebot)", fontSize = 13.sp) },
+                    placeholder = { Text("Имя пакета (напр. httpx, telebot)", fontSize = 13.sp, color = TextMuted) },
                     modifier = Modifier
                         .weight(1f)
                         .testTag("custom_package_input"),
                     singleLine = true,
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = CyanAccent,
-                        unfocusedBorderColor = IdeBorder,
+                        focusedBorderColor = TextPrimary,
+                        unfocusedBorderColor = DarkBorder,
                         focusedTextColor = TextPrimary,
-                        unfocusedTextColor = TextPrimary
+                        unfocusedTextColor = TextPrimary,
+                        focusedContainerColor = DarkSurfaceElevated,
+                        unfocusedContainerColor = DarkSurfaceElevated
                     ),
-                    shape = RoundedCornerShape(10.dp)
+                    shape = RoundedCornerShape(8.dp)
                 )
                 Button(
                     onClick = {
@@ -122,8 +124,8 @@ fun PackageManagerSheet(
                             customPackageInput = ""
                         }
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = CyanAccent, contentColor = IdeBackground),
-                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = TextPrimary, contentColor = DarkBg),
+                    shape = RoundedCornerShape(8.dp),
                     enabled = customPackageInput.isNotBlank(),
                     modifier = Modifier.testTag("pip_install_btn")
                 ) {
@@ -139,22 +141,24 @@ fun PackageManagerSheet(
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                placeholder = { Text("Поиск по каталогу библиотек...", fontSize = 13.sp) },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = TextSecondary) },
+                placeholder = { Text("Поиск по каталогу библиотек...", fontSize = 13.sp, color = TextMuted) },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = TextMuted) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = CyanAccent,
-                    unfocusedBorderColor = IdeBorder,
+                    focusedBorderColor = TextPrimary,
+                    unfocusedBorderColor = DarkBorder,
                     focusedTextColor = TextPrimary,
-                    unfocusedTextColor = TextPrimary
+                    unfocusedTextColor = TextPrimary,
+                    focusedContainerColor = DarkSurfaceElevated,
+                    unfocusedContainerColor = DarkSurfaceElevated
                 ),
-                shape = RoundedCornerShape(10.dp)
+                shape = RoundedCornerShape(8.dp)
             )
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Category filter chips
+            // Category filter chips (Stealth Dark)
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                 modifier = Modifier.fillMaxWidth()
@@ -166,13 +170,13 @@ fun PackageManagerSheet(
                         onClick = { selectedCategory = cat },
                         label = { Text(cat, fontSize = 12.sp) },
                         colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = CyanAccentMuted,
+                            selectedContainerColor = DarkSurfaceHighlight,
                             selectedLabelColor = TextPrimary,
-                            containerColor = IdeSurfaceVariant,
+                            containerColor = DarkSurfaceElevated,
                             labelColor = TextSecondary
                         ),
                         border = FilterChipDefaults.filterChipBorder(
-                            borderColor = if (isSelected) CyanAccent else IdeBorder,
+                            borderColor = if (isSelected) TextPrimary else DarkBorder,
                             enabled = true,
                             selected = isSelected
                         )
@@ -228,11 +232,9 @@ fun PackageCardItem(
     onUninstall: () -> Unit
 ) {
     Card(
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = IdeSurfaceVariant),
-        border = CardDefaults.outlinedCardBorder().copy(
-            brush = androidx.compose.ui.graphics.SolidColor(if (isInstalled) CyanAccent.copy(alpha = 0.5f) else IdeBorder)
-        ),
+        shape = RoundedCornerShape(10.dp),
+        colors = CardDefaults.cardColors(containerColor = DarkSurfaceElevated),
+        border = androidx.compose.foundation.BorderStroke(1.dp, if (isInstalled) TextSecondary else DarkBorder),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(14.dp)) {
@@ -249,13 +251,13 @@ fun PackageCardItem(
                         fontWeight = FontWeight.Bold
                     )
                     Surface(
-                        color = IdeBackground,
+                        color = DarkBg,
                         shape = RoundedCornerShape(4.dp),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, IdeBorder)
+                        border = androidx.compose.foundation.BorderStroke(1.dp, DarkBorder)
                     ) {
                         Text(
                             "v${pkg.version}",
-                            color = CyanAccent,
+                            color = TextSecondary,
                             fontSize = 11.sp,
                             modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                         )
@@ -266,25 +268,26 @@ fun PackageCardItem(
                     FilledTonalButton(
                         onClick = onUninstall,
                         colors = ButtonDefaults.filledTonalButtonColors(
-                            containerColor = RoseAccent.copy(alpha = 0.15f),
-                            contentColor = RoseAccent
+                            containerColor = DarkSurfaceHighlight,
+                            contentColor = TextPrimary
                         ),
-                        shape = RoundedCornerShape(8.dp),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, DarkBorder),
+                        shape = RoundedCornerShape(6.dp),
                         contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
                         modifier = Modifier.height(32.dp)
                     ) {
-                        Icon(Icons.Default.DeleteOutline, contentDescription = null, modifier = Modifier.size(14.dp))
+                        Icon(Icons.Default.DeleteOutline, contentDescription = null, modifier = Modifier.size(14.dp), tint = TextSecondary)
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Удалить", fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                        Text("Удалить", fontSize = 11.sp, fontWeight = FontWeight.Normal)
                     }
                 } else {
                     Button(
                         onClick = onInstall,
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = CyanAccent,
-                            contentColor = IdeBackground
+                            containerColor = TextPrimary,
+                            contentColor = DarkBg
                         ),
-                        shape = RoundedCornerShape(8.dp),
+                        shape = RoundedCornerShape(6.dp),
                         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
                         modifier = Modifier.height(32.dp).testTag("install_${pkg.name}")
                     ) {
@@ -310,13 +313,14 @@ fun PackageCardItem(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(6.dp))
-                        .background(IdeBackground)
+                        .background(DarkBg)
+                        .border(1.dp, DarkBorder, RoundedCornerShape(6.dp))
                         .padding(horizontal = 8.dp, vertical = 6.dp)
                 ) {
                     Text(
                         pkg.importSnippet,
                         fontFamily = FontFamily.Monospace,
-                        color = IndigoAccent,
+                        color = TextSecondary,
                         fontSize = 11.sp
                     )
                 }

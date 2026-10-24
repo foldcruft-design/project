@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -34,7 +33,6 @@ import com.example.engine.TelegramBotSimulator
 import com.example.model.ConsoleEntry
 import com.example.model.LogType
 import com.example.ui.theme.*
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,7 +48,6 @@ fun ExecutionConsoleSheet(
 ) {
     val context = LocalContext.current
     var selectedTab by remember { mutableStateOf(if (simulator != null) 1 else 0) }
-    val coroutineScope = rememberCoroutineScope()
     val terminalListState = rememberLazyListState()
     val botListState = rememberLazyListState()
 
@@ -73,8 +70,8 @@ fun ExecutionConsoleSheet(
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        containerColor = IdeSurface,
-        dragHandle = { BottomSheetDefaults.DragHandle(color = IdeBorder) }
+        containerColor = DarkSurface,
+        dragHandle = { BottomSheetDefaults.DragHandle(color = DarkBorder) }
     ) {
         Column(
             modifier = Modifier
@@ -92,12 +89,12 @@ fun ExecutionConsoleSheet(
                     Icon(
                         Icons.Default.Terminal,
                         contentDescription = null,
-                        tint = if (isRunning) AmberAccent else CyanAccent
+                        tint = TextPrimary
                     )
                     Column {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             Text(
-                                "Консоль и Запуск",
+                                "Консоль и Выполнение",
                                 style = MaterialTheme.typography.titleMedium,
                                 color = TextPrimary,
                                 fontWeight = FontWeight.Bold
@@ -106,7 +103,7 @@ fun ExecutionConsoleSheet(
                                 CircularProgressIndicator(
                                     modifier = Modifier.size(12.dp),
                                     strokeWidth = 2.dp,
-                                    color = AmberAccent
+                                    color = TextPrimary
                                 )
                             }
                         }
@@ -124,7 +121,7 @@ fun ExecutionConsoleSheet(
                         modifier = Modifier.testTag("console_rerun_btn"),
                         enabled = !isRunning
                     ) {
-                        Icon(Icons.Default.PlayArrow, contentDescription = "Перезапуск", tint = EmeraldAccent)
+                        Icon(Icons.Default.PlayArrow, contentDescription = "Перезапуск", tint = TextPrimary)
                     }
                     IconButton(onClick = onClearLogs, modifier = Modifier.testTag("console_clear_btn")) {
                         Icon(Icons.Default.ClearAll, contentDescription = "Очистить", tint = TextSecondary)
@@ -137,26 +134,28 @@ fun ExecutionConsoleSheet(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Tabs: Terminal vs Bot Simulator
+            // Tabs: Terminal vs Bot Simulator (Stealth Dark)
             TabRow(
                 selectedTabIndex = selectedTab,
-                containerColor = IdeSurfaceVariant,
-                contentColor = CyanAccent,
+                containerColor = DarkSurfaceElevated,
+                contentColor = TextPrimary,
                 indicator = { tabPositions ->
                     TabRowDefaults.SecondaryIndicator(
                         Modifier.tabIndicatorOffset(tabPositions[selectedTab]),
-                        color = CyanAccent
+                        color = TextPrimary
                     )
                 },
-                modifier = Modifier.clip(RoundedCornerShape(8.dp))
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .border(1.dp, DarkBorder, RoundedCornerShape(8.dp))
             ) {
                 Tab(
                     selected = selectedTab == 0,
                     onClick = { selectedTab = 0 },
                     text = {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                            Icon(Icons.Default.Code, contentDescription = null, modifier = Modifier.size(14.dp))
-                            Text("Терминал (${logs.size})", fontSize = 12.sp, fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Normal)
+                            Icon(Icons.Default.Code, contentDescription = null, modifier = Modifier.size(14.dp), tint = TextSecondary)
+                            Text("Терминал (${logs.size})", fontSize = 12.sp, fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Normal, color = if (selectedTab == 0) TextPrimary else TextSecondary)
                         }
                     }
                 )
@@ -165,8 +164,8 @@ fun ExecutionConsoleSheet(
                     onClick = { selectedTab = 1 },
                     text = {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                            Icon(Icons.Default.SmartToy, contentDescription = null, modifier = Modifier.size(14.dp))
-                            Text("Симулятор Бота", fontSize = 12.sp, fontWeight = if (selectedTab == 1) FontWeight.Bold else FontWeight.Normal)
+                            Icon(Icons.Default.SmartToy, contentDescription = null, modifier = Modifier.size(14.dp), tint = TextSecondary)
+                            Text("Симулятор Бота", fontSize = 12.sp, fontWeight = if (selectedTab == 1) FontWeight.Bold else FontWeight.Normal, color = if (selectedTab == 1) TextPrimary else TextSecondary)
                         }
                     }
                 )
@@ -175,14 +174,14 @@ fun ExecutionConsoleSheet(
             Spacer(modifier = Modifier.height(12.dp))
 
             if (selectedTab == 0) {
-                // TERMINAL VIEW
+                // TERMINAL VIEW (Stealth Dark Monochrome)
                 Box(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(IdeBackground)
-                        .border(1.dp, IdeBorder, RoundedCornerShape(10.dp))
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(DarkBg)
+                        .border(1.dp, DarkBorder, RoundedCornerShape(8.dp))
                         .padding(10.dp)
                 ) {
                     if (logs.isEmpty()) {
@@ -191,7 +190,7 @@ fun ExecutionConsoleSheet(
                                 Icon(Icons.Default.PlayCircleOutline, contentDescription = null, tint = TextMuted, modifier = Modifier.size(36.dp))
                                 Spacer(modifier = Modifier.height(6.dp))
                                 Text("Консоль пуста", color = TextSecondary, fontSize = 13.sp)
-                                Text("Нажмите ▶ Запустить для исполнения кода", color = TextMuted, fontSize = 11.sp)
+                                Text("Нажмите ▶ Запуск для исполнения кода", color = TextMuted, fontSize = 11.sp)
                             }
                         }
                     } else {
@@ -202,12 +201,12 @@ fun ExecutionConsoleSheet(
                         ) {
                             items(logs) { entry ->
                                 val color = when (entry.type) {
-                                    LogType.STDOUT -> Color(0xFFE2E8F0)
-                                    LogType.STDERR -> RoseAccent
-                                    LogType.SYSTEM -> CyanAccent
-                                    LogType.SUCCESS -> EmeraldAccent
-                                    LogType.BOT_INCOMING -> IndigoAccent
-                                    LogType.BOT_OUTGOING -> AmberAccent
+                                    LogType.STDOUT -> TextPrimary
+                                    LogType.STDERR -> Color(0xFFFCA5A5) // Subtle soft red for errors only
+                                    LogType.SYSTEM -> TextSecondary
+                                    LogType.SUCCESS -> TextPrimary
+                                    LogType.BOT_INCOMING -> TextSecondary
+                                    LogType.BOT_OUTGOING -> TextPrimary
                                 }
                                 Text(
                                     text = entry.text,
@@ -242,13 +241,13 @@ fun ExecutionConsoleSheet(
                             Toast.makeText(context, "Логи скопированы!", Toast.LENGTH_SHORT).show()
                         }
                     ) {
-                        Icon(Icons.Default.ContentCopy, contentDescription = null, modifier = Modifier.size(14.dp))
+                        Icon(Icons.Default.ContentCopy, contentDescription = null, modifier = Modifier.size(14.dp), tint = TextSecondary)
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Скопировать все", fontSize = 11.sp, color = CyanAccent)
+                        Text("Скопировать", fontSize = 11.sp, color = TextSecondary)
                     }
                 }
             } else {
-                // BOT SIMULATOR VIEW
+                // BOT SIMULATOR VIEW (Stealth Dark)
                 val messages = simulator?.messages ?: emptyList()
 
                 Column(
@@ -261,9 +260,9 @@ fun ExecutionConsoleSheet(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxWidth()
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(Color(0xFF0F141C))
-                            .border(1.dp, IdeBorder, RoundedCornerShape(10.dp))
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(DarkBg)
+                            .border(1.dp, DarkBorder, RoundedCornerShape(8.dp))
                             .padding(10.dp)
                     ) {
                         LazyColumn(
@@ -279,17 +278,14 @@ fun ExecutionConsoleSheet(
                                 ) {
                                     // Bubble
                                     Surface(
-                                        color = if (isUser) CyanAccentMuted else IdeSurfaceVariant,
+                                        color = if (isUser) DarkSurfaceHighlight else DarkSurfaceElevated,
                                         shape = RoundedCornerShape(
-                                            topStart = 12.dp,
-                                            topEnd = 12.dp,
-                                            bottomStart = if (isUser) 12.dp else 2.dp,
-                                            bottomEnd = if (isUser) 2.dp else 12.dp
+                                            topStart = 10.dp,
+                                            topEnd = 10.dp,
+                                            bottomStart = if (isUser) 10.dp else 2.dp,
+                                            bottomEnd = if (isUser) 2.dp else 10.dp
                                         ),
-                                        border = androidx.compose.foundation.BorderStroke(
-                                            1.dp,
-                                            if (isUser) CyanAccent.copy(alpha = 0.4f) else IdeBorder
-                                        ),
+                                        border = androidx.compose.foundation.BorderStroke(1.dp, DarkBorder),
                                         modifier = Modifier.widthIn(max = 280.dp)
                                     ) {
                                         Text(
@@ -317,10 +313,11 @@ fun ExecutionConsoleSheet(
                                                         FilledTonalButton(
                                                             onClick = { onSendBotCallback(btn.callbackData) },
                                                             colors = ButtonDefaults.filledTonalButtonColors(
-                                                                containerColor = IdeSurfaceVariant,
-                                                                contentColor = CyanAccent
+                                                                containerColor = DarkSurfaceElevated,
+                                                                contentColor = TextPrimary
                                                             ),
-                                                            shape = RoundedCornerShape(8.dp),
+                                                            border = androidx.compose.foundation.BorderStroke(1.dp, DarkBorder),
+                                                            shape = RoundedCornerShape(6.dp),
                                                             contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
                                                             modifier = Modifier.weight(1f).height(34.dp)
                                                         ) {
@@ -352,8 +349,8 @@ fun ExecutionConsoleSheet(
                         items(quickCommands) { cmd ->
                             Surface(
                                 shape = RoundedCornerShape(16.dp),
-                                color = IdeSurfaceVariant,
-                                border = androidx.compose.foundation.BorderStroke(1.dp, IdeBorder),
+                                color = DarkSurfaceElevated,
+                                border = androidx.compose.foundation.BorderStroke(1.dp, DarkBorder),
                                 modifier = Modifier.clickable {
                                     onSendBotMessage(cmd)
                                 }
@@ -361,7 +358,7 @@ fun ExecutionConsoleSheet(
                                 Text(
                                     cmd,
                                     fontSize = 11.sp,
-                                    color = IndigoAccent,
+                                    color = TextSecondary,
                                     modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
                                 )
                             }
@@ -379,16 +376,18 @@ fun ExecutionConsoleSheet(
                         OutlinedTextField(
                             value = userMessageInput,
                             onValueChange = { userMessageInput = it },
-                            placeholder = { Text("Напишите команду боту...", fontSize = 12.sp) },
+                            placeholder = { Text("Напишите команду боту...", fontSize = 12.sp, color = TextMuted) },
                             modifier = Modifier
                                 .weight(1f)
                                 .testTag("bot_chat_input"),
                             singleLine = true,
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = CyanAccent,
-                                unfocusedBorderColor = IdeBorder,
+                                focusedBorderColor = TextPrimary,
+                                unfocusedBorderColor = DarkBorder,
                                 focusedTextColor = TextPrimary,
-                                unfocusedTextColor = TextPrimary
+                                unfocusedTextColor = TextPrimary,
+                                focusedContainerColor = DarkSurfaceElevated,
+                                unfocusedContainerColor = DarkSurfaceElevated
                             ),
                             shape = RoundedCornerShape(20.dp)
                         )
@@ -402,8 +401,8 @@ fun ExecutionConsoleSheet(
                                 }
                             },
                             colors = IconButtonDefaults.iconButtonColors(
-                                containerColor = CyanAccent,
-                                contentColor = IdeBackground
+                                containerColor = TextPrimary,
+                                contentColor = DarkBg
                             ),
                             enabled = userMessageInput.isNotBlank(),
                             modifier = Modifier.testTag("send_bot_msg_btn")

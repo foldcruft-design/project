@@ -12,8 +12,8 @@ object GitHubActionsHub {
 
     val androidApkWorkflow = WorkflowTemplate(
         id = "android_apk",
-        title = "Сборка APK в GitHub Actions",
-        fileName = ".github/workflows/build-apk.yml",
+        title = "Сборка APK в GitHub Actions (android.yml)",
+        fileName = ".github/workflows/android.yml",
         description = "Полный CI/CD пайплайн: компилирует APK приложения на серверах GitHub и выкладывает готовый установочный файл в Artifacts.",
         ymlContent = """name: Build Android APK
 
@@ -107,7 +107,7 @@ jobs:
         GuideStep(
             number = "2",
             title = "Добавьте файл воркфлоу",
-            details = "Нажмите кнопку 'Добавить в проект' ниже. В проекте появится файл .github/workflows/build-apk.yml."
+            details = "Нажмите кнопку 'Добавить в проект' ниже. В проекте появится файл .github/workflows/android.yml."
         ),
         GuideStep(
             number = "3",

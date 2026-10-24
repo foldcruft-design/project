@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.example.ui.editor.CodeEditorScreen
-import com.example.ui.theme.IdeBackground
+import com.example.ui.theme.DarkBg
 import com.example.ui.theme.MyApplicationTheme
 import com.example.viewmodel.CodeStudioViewModel
 
@@ -24,7 +24,7 @@ class MainActivity : ComponentActivity() {
             MyApplicationTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = IdeBackground
+                    color = DarkBg
                 ) {
                     CodeEditorScreen(viewModel = viewModel)
                 }

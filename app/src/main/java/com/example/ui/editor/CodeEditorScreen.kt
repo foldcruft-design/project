@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
@@ -65,7 +64,7 @@ fun CodeEditorScreen(
         mutableStateOf(TextFieldValue(activeFile?.content ?: ""))
     }
 
-    // Keep text in sync if external updates (like snippets or file changes) occur
+    // Keep text in sync if external updates occur
     LaunchedEffect(activeFile?.content) {
         val externalContent = activeFile?.content ?: ""
         if (textFieldValue.text != externalContent) {
@@ -85,15 +84,16 @@ fun CodeEditorScreen(
                             .testTag("topbar_project_chip")
                     ) {
                         Surface(
-                            color = CyanAccent,
+                            color = DarkSurfaceHighlight,
                             shape = RoundedCornerShape(6.dp),
-                            modifier = Modifier.size(24.dp)
+                            border = androidx.compose.foundation.BorderStroke(1.dp, DarkBorder),
+                            modifier = Modifier.size(28.dp)
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
-                                    Icons.Default.Code,
+                                    Icons.Default.Terminal,
                                     contentDescription = null,
-                                    tint = IdeBackground,
+                                    tint = TextPrimary,
                                     modifier = Modifier.size(16.dp)
                                 )
                             }
@@ -107,37 +107,38 @@ fun CodeEditorScreen(
                                     fontWeight = FontWeight.Bold,
                                     maxLines = 1
                                 )
-                                Icon(Icons.Default.ArrowDropDown, contentDescription = null, tint = CyanAccent, modifier = Modifier.size(18.dp))
+                                Icon(Icons.Default.ArrowDropDown, contentDescription = null, tint = TextSecondary, modifier = Modifier.size(16.dp))
                             }
                             Text(
                                 "${currentProject.files.size} файлов • ${currentTheme.name}",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = TextSecondary,
+                                color = TextMuted,
                                 fontSize = 10.sp
                             )
                         }
                     }
                 },
                 actions = {
-                    // RUN BUTTON
+                    // RUN / STOP BUTTON (Stealth Dark Monochrome)
                     FilledTonalButton(
                         onClick = { viewModel.runProject() },
                         colors = ButtonDefaults.filledTonalButtonColors(
-                            containerColor = if (isRunning) AmberAccent.copy(alpha = 0.2f) else EmeraldAccent.copy(alpha = 0.2f),
-                            contentColor = if (isRunning) AmberAccent else EmeraldAccent
+                            containerColor = if (isRunning) DarkSurfaceHighlight else DarkSurfaceElevated,
+                            contentColor = TextPrimary
                         ),
                         shape = RoundedCornerShape(8.dp),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, if (isRunning) TextSecondary else DarkBorder),
                         contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
                         modifier = Modifier.height(34.dp).testTag("run_project_btn")
                     ) {
                         if (isRunning) {
-                            CircularProgressIndicator(modifier = Modifier.size(14.dp), strokeWidth = 2.dp, color = AmberAccent)
+                            CircularProgressIndicator(modifier = Modifier.size(14.dp), strokeWidth = 2.dp, color = TextPrimary)
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("Стоп", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            Text("Стоп", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
                         } else {
-                            Icon(Icons.Default.PlayArrow, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Icon(Icons.Default.PlayArrow, contentDescription = null, modifier = Modifier.size(16.dp), tint = TextPrimary)
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("Запуск", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            Text("Запуск", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
                         }
                     }
 
@@ -146,7 +147,7 @@ fun CodeEditorScreen(
                         onClick = { viewModel.openSheet(ActiveSheet.FILE_EXPLORER) },
                         modifier = Modifier.testTag("open_explorer_btn")
                     ) {
-                        Icon(Icons.Default.FolderOpen, contentDescription = "Файлы", tint = TextPrimary)
+                        Icon(Icons.Default.Folder, contentDescription = "Файлы", tint = TextSecondary)
                     }
 
                     // OVERFLOW MENU
@@ -154,74 +155,76 @@ fun CodeEditorScreen(
                         onClick = { showMenu = true },
                         modifier = Modifier.testTag("overflow_menu_btn")
                     ) {
-                        Icon(Icons.Default.MoreVert, contentDescription = "Меню", tint = TextPrimary)
+                        Icon(Icons.Default.MoreVert, contentDescription = "Меню", tint = TextSecondary)
                     }
 
                     DropdownMenu(
                         expanded = showMenu,
                         onDismissRequest = { showMenu = false },
-                        modifier = Modifier.background(IdeSurfaceVariant)
+                        modifier = Modifier
+                            .background(DarkSurfaceElevated)
+                            .border(1.dp, DarkBorder, RoundedCornerShape(8.dp))
                     ) {
                         DropdownMenuItem(
-                            text = { Text("Библиотеки (pip)", color = TextPrimary) },
+                            text = { Text("Библиотеки (pip)", color = TextPrimary, fontSize = 13.sp) },
                             onClick = {
                                 showMenu = false
                                 viewModel.openSheet(ActiveSheet.PACKAGES)
                             },
-                            leadingIcon = { Icon(Icons.Default.Extension, contentDescription = null, tint = CyanAccent) }
+                            leadingIcon = { Icon(Icons.Default.Extension, contentDescription = null, tint = TextSecondary) }
                         )
                         DropdownMenuItem(
-                            text = { Text("Карточки кода (Сниппеты)", color = TextPrimary) },
+                            text = { Text("Карточки кода (Сниппеты)", color = TextPrimary, fontSize = 13.sp) },
                             onClick = {
                                 showMenu = false
                                 viewModel.openSheet(ActiveSheet.SNIPPETS)
                             },
-                            leadingIcon = { Icon(Icons.Default.Layers, contentDescription = null, tint = IndigoAccent) }
+                            leadingIcon = { Icon(Icons.Default.Layers, contentDescription = null, tint = TextSecondary) }
                         )
                         DropdownMenuItem(
-                            text = { Text("GitHub Actions (Сборка APK)", color = TextPrimary) },
+                            text = { Text("GitHub Actions (Сборка APK)", color = TextPrimary, fontSize = 13.sp) },
                             onClick = {
                                 showMenu = false
                                 viewModel.openSheet(ActiveSheet.GITHUB_ACTIONS)
                             },
-                            leadingIcon = { Icon(Icons.Default.CloudSync, contentDescription = null, tint = EmeraldAccent) }
+                            leadingIcon = { Icon(Icons.Default.CloudSync, contentDescription = null, tint = TextSecondary) }
                         )
                         DropdownMenuItem(
-                            text = { Text("Цвета кода и темы", color = TextPrimary) },
+                            text = { Text("Темные темы кода", color = TextPrimary, fontSize = 13.sp) },
                             onClick = {
                                 showMenu = false
                                 viewModel.openSheet(ActiveSheet.THEMES)
                             },
-                            leadingIcon = { Icon(Icons.Default.FormatPaint, contentDescription = null, tint = AmberAccent) }
+                            leadingIcon = { Icon(Icons.Default.FormatPaint, contentDescription = null, tint = TextSecondary) }
                         )
-                        HorizontalDivider(color = IdeBorder)
+                        HorizontalDivider(color = DarkBorder)
                         DropdownMenuItem(
-                            text = { Text("+ Создать файл", color = CyanAccent) },
+                            text = { Text("+ Создать файл", color = TextPrimary, fontWeight = FontWeight.SemiBold, fontSize = 13.sp) },
                             onClick = {
                                 showMenu = false
                                 viewModel.openSheet(ActiveSheet.CREATE_FILE_DIALOG)
                             },
-                            leadingIcon = { Icon(Icons.Default.NoteAdd, contentDescription = null, tint = CyanAccent) }
+                            leadingIcon = { Icon(Icons.Default.NoteAdd, contentDescription = null, tint = TextPrimary) }
                         )
                         DropdownMenuItem(
-                            text = { Text("+ Создать проект", color = IndigoAccent) },
+                            text = { Text("+ Создать проект", color = TextSecondary, fontSize = 13.sp) },
                             onClick = {
                                 showMenu = false
                                 viewModel.openSheet(ActiveSheet.CREATE_PROJECT_DIALOG)
                             },
-                            leadingIcon = { Icon(Icons.Default.CreateNewFolder, contentDescription = null, tint = IndigoAccent) }
+                            leadingIcon = { Icon(Icons.Default.CreateNewFolder, contentDescription = null, tint = TextSecondary) }
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = IdeSurface,
+                    containerColor = DarkSurface,
                     titleContentColor = TextPrimary
                 )
             )
         },
         bottomBar = {
-            Column(modifier = Modifier.background(IdeSurface)) {
-                // MOBILE CODING ACCESSORY BAR
+            Column(modifier = Modifier.background(DarkSurface)) {
+                // MOBILE CODING ACCESSORY BAR (Stealth Dark)
                 MobileCodingToolbar(
                     onInsertSymbol = { symbol ->
                         val currentText = textFieldValue.text
@@ -246,7 +249,7 @@ fun CodeEditorScreen(
                     }
                 )
 
-                HorizontalDivider(color = IdeBorder)
+                HorizontalDivider(color = DarkBorder)
 
                 // BOTTOM STATUS BAR
                 Row(
@@ -276,32 +279,34 @@ fun CodeEditorScreen(
                         FilledTonalButton(
                             onClick = { viewModel.openSheet(ActiveSheet.SNIPPETS) },
                             colors = ButtonDefaults.filledTonalButtonColors(
-                                containerColor = IdeSurfaceVariant,
-                                contentColor = IndigoAccent
+                                containerColor = DarkSurfaceElevated,
+                                contentColor = TextPrimary
                             ),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, DarkBorder),
                             shape = RoundedCornerShape(6.dp),
                             contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
                             modifier = Modifier.height(28.dp).testTag("quick_snippets_btn")
                         ) {
-                            Icon(Icons.Default.Layers, contentDescription = null, modifier = Modifier.size(12.dp))
+                            Icon(Icons.Default.Layers, contentDescription = null, modifier = Modifier.size(12.dp), tint = TextSecondary)
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("Карточки", fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                            Text("Карточки", fontSize = 11.sp, fontWeight = FontWeight.Normal)
                         }
 
                         // Terminal console trigger
                         FilledTonalButton(
                             onClick = { viewModel.openSheet(ActiveSheet.CONSOLE) },
                             colors = ButtonDefaults.filledTonalButtonColors(
-                                containerColor = if (logs.isNotEmpty()) CyanAccentMuted.copy(alpha = 0.3f) else IdeSurfaceVariant,
-                                contentColor = CyanAccent
+                                containerColor = if (logs.isNotEmpty()) DarkSurfaceHighlight else DarkSurfaceElevated,
+                                contentColor = TextPrimary
                             ),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, if (logs.isNotEmpty()) TextSecondary else DarkBorder),
                             shape = RoundedCornerShape(6.dp),
                             contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
                             modifier = Modifier.height(28.dp).testTag("quick_console_btn")
                         ) {
-                            Icon(Icons.Default.Terminal, contentDescription = null, modifier = Modifier.size(12.dp))
+                            Icon(Icons.Default.Terminal, contentDescription = null, modifier = Modifier.size(12.dp), tint = TextSecondary)
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("Консоль (${logs.size})", fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                            Text("Консоль (${logs.size})", fontSize = 11.sp, fontWeight = FontWeight.Normal)
                         }
                     }
                 }
@@ -330,7 +335,7 @@ fun CodeEditorScreen(
                 }
             )
 
-            HorizontalDivider(color = IdeBorder)
+            HorizontalDivider(color = DarkBorder)
 
             // CODE EDITOR CANVAS
             if (activeFile != null) {
@@ -342,15 +347,14 @@ fun CodeEditorScreen(
                     // Line numbers gutter
                     if (settings.showLineNumbers) {
                         val lineCount = remember(textFieldValue.text) { textFieldValue.text.lines().size }
-                        val scrollStateGutter = rememberScrollState()
 
                         Column(
                             modifier = Modifier
-                                .width(36.dp)
+                                .width(38.dp)
                                 .fillMaxHeight()
-                                .background(currentTheme.editorBackground.copy(alpha = 0.95f))
-                                .border(width = 0.5.dp, color = IdeBorder)
-                                .padding(vertical = 12.dp),
+                                .background(DarkSurface)
+                                .border(width = 0.5.dp, color = DarkBorder)
+                                .padding(vertical = 10.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             for (i in 1..lineCount) {
@@ -411,7 +415,8 @@ fun CodeEditorScreen(
                         Spacer(modifier = Modifier.height(12.dp))
                         Button(
                             onClick = { viewModel.openSheet(ActiveSheet.FILE_EXPLORER) },
-                            colors = ButtonDefaults.buttonColors(containerColor = CyanAccent, contentColor = IdeBackground)
+                            colors = ButtonDefaults.buttonColors(containerColor = DarkSurfaceElevated, contentColor = TextPrimary),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, DarkBorder)
                         ) {
                             Text("Открыть проводник")
                         }
@@ -506,7 +511,7 @@ fun MultiFileTabBar(
     LazyRow(
         modifier = Modifier
             .fillMaxWidth()
-            .background(IdeSurface)
+            .background(DarkSurface)
             .padding(horizontal = 4.dp, vertical = 4.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -518,8 +523,8 @@ fun MultiFileTabBar(
 
                 Surface(
                     shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp),
-                    color = if (isActive) IdeSurfaceVariant else Color.Transparent,
-                    border = if (isActive) androidx.compose.foundation.BorderStroke(1.dp, CyanAccent.copy(alpha = 0.5f)) else null,
+                    color = if (isActive) DarkSurfaceElevated else Color.Transparent,
+                    border = if (isActive) androidx.compose.foundation.BorderStroke(1.dp, DarkBorder) else null,
                     modifier = Modifier.clickable { onSelectTab(file.id) }
                 ) {
                     Row(
@@ -527,13 +532,12 @@ fun MultiFileTabBar(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
-                        val iconTint = when {
-                            file.isPython -> CyanAccent
-                            file.isEnv -> AmberAccent
-                            file.isRequirements -> EmeraldAccent
-                            else -> IndigoAccent
-                        }
-                        Icon(Icons.Default.InsertDriveFile, contentDescription = null, tint = iconTint, modifier = Modifier.size(14.dp))
+                        Icon(
+                            Icons.Default.InsertDriveFile,
+                            contentDescription = null,
+                            tint = if (isActive) TextPrimary else TextMuted,
+                            modifier = Modifier.size(14.dp)
+                        )
                         Text(
                             text = file.name,
                             fontSize = 12.sp,
@@ -542,7 +546,7 @@ fun MultiFileTabBar(
                             color = if (isActive) TextPrimary else TextSecondary
                         )
                         if (file.isEntrypoint) {
-                            Text("⭐", fontSize = 10.sp)
+                            Text("★", fontSize = 10.sp, color = TextSecondary)
                         }
                         if (openTabIds.size > 1) {
                             Icon(
@@ -564,7 +568,7 @@ fun MultiFileTabBar(
                 onClick = onAddNewFile,
                 modifier = Modifier.size(28.dp).testTag("tabbar_add_file_btn")
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Добавить файл", tint = CyanAccent, modifier = Modifier.size(16.dp))
+                Icon(Icons.Default.Add, contentDescription = "Добавить файл", tint = TextSecondary, modifier = Modifier.size(16.dp))
             }
         }
     }
@@ -583,7 +587,7 @@ fun MobileCodingToolbar(
     LazyRow(
         modifier = Modifier
             .fillMaxWidth()
-            .background(IdeSurfaceVariant)
+            .background(DarkSurfaceElevated)
             .padding(horizontal = 6.dp, vertical = 4.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -592,7 +596,8 @@ fun MobileCodingToolbar(
         item {
             Surface(
                 shape = RoundedCornerShape(6.dp),
-                color = CyanAccentMuted,
+                color = DarkSurfaceHighlight,
+                border = androidx.compose.foundation.BorderStroke(1.dp, DarkBorder),
                 modifier = Modifier.clickable { onTabIndent() }
             ) {
                 Text(
@@ -609,8 +614,8 @@ fun MobileCodingToolbar(
         items(quickSymbols) { symbol ->
             Surface(
                 shape = RoundedCornerShape(6.dp),
-                color = IdeBackground,
-                border = androidx.compose.foundation.BorderStroke(1.dp, IdeBorder),
+                color = DarkBg,
+                border = androidx.compose.foundation.BorderStroke(1.dp, DarkBorder),
                 modifier = Modifier.clickable { onInsertSymbol(symbol) }
             ) {
                 Text(

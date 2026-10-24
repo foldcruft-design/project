@@ -1,6 +1,7 @@
 package com.example.ui.sheets
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -40,8 +41,8 @@ fun FileExplorerSheet(
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        containerColor = IdeSurface,
-        dragHandle = { BottomSheetDefaults.DragHandle(color = IdeBorder) }
+        containerColor = DarkSurface,
+        dragHandle = { BottomSheetDefaults.DragHandle(color = DarkBorder) }
     ) {
         Column(
             modifier = Modifier
@@ -56,7 +57,7 @@ fun FileExplorerSheet(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Icon(Icons.Default.FolderOpen, contentDescription = null, tint = CyanAccent)
+                    Icon(Icons.Default.Folder, contentDescription = null, tint = TextPrimary)
                     Column {
                         Text(
                             "Проводник файлов",
@@ -80,9 +81,9 @@ fun FileExplorerSheet(
 
             // Project Selector Card
             Surface(
-                color = IdeSurfaceVariant,
-                shape = RoundedCornerShape(10.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, IdeBorder),
+                color = DarkSurfaceElevated,
+                shape = RoundedCornerShape(8.dp),
+                border = androidx.compose.foundation.BorderStroke(1.dp, DarkBorder),
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { showProjectDropdown = true }
@@ -94,11 +95,11 @@ fun FileExplorerSheet(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column {
-                        Text("АКТИВНЫЙ ПРОЕКТ", fontSize = 10.sp, color = TextSecondary, fontWeight = FontWeight.Bold)
+                        Text("АКТИВНЫЙ ПРОЕКТ", fontSize = 10.sp, color = TextMuted, fontWeight = FontWeight.Bold)
                         Text(project.name, fontSize = 14.sp, color = TextPrimary, fontWeight = FontWeight.Bold)
-                        Text(project.description, fontSize = 11.sp, color = TextMuted, maxLines = 1)
+                        Text(project.description, fontSize = 11.sp, color = TextSecondary, maxLines = 1)
                     }
-                    Icon(Icons.Default.UnfoldMore, contentDescription = null, tint = CyanAccent)
+                    Icon(Icons.Default.UnfoldMore, contentDescription = null, tint = TextSecondary)
                 }
             }
 
@@ -106,7 +107,9 @@ fun FileExplorerSheet(
             DropdownMenu(
                 expanded = showProjectDropdown,
                 onDismissRequest = { showProjectDropdown = false },
-                modifier = Modifier.background(IdeSurfaceVariant)
+                modifier = Modifier
+                    .background(DarkSurfaceElevated)
+                    .border(1.dp, DarkBorder, RoundedCornerShape(8.dp))
             ) {
                 allProjects.forEach { p ->
                     DropdownMenuItem(
@@ -124,19 +127,19 @@ fun FileExplorerSheet(
                             Icon(
                                 if (p.id == project.id) Icons.Default.CheckCircle else Icons.Default.Folder,
                                 contentDescription = null,
-                                tint = if (p.id == project.id) CyanAccent else TextSecondary
+                                tint = if (p.id == project.id) TextPrimary else TextMuted
                             )
                         }
                     )
                 }
-                HorizontalDivider(color = IdeBorder)
+                HorizontalDivider(color = DarkBorder)
                 DropdownMenuItem(
-                    text = { Text("+ Создать новый проект", color = CyanAccent, fontWeight = FontWeight.Bold) },
+                    text = { Text("+ Создать новый проект", color = TextPrimary, fontWeight = FontWeight.Bold) },
                     onClick = {
                         showProjectDropdown = false
                         onCreateNewProjectClicked()
                     },
-                    leadingIcon = { Icon(Icons.Default.CreateNewFolder, contentDescription = null, tint = CyanAccent) }
+                    leadingIcon = { Icon(Icons.Default.CreateNewFolder, contentDescription = null, tint = TextPrimary) }
                 )
             }
 
@@ -157,8 +160,8 @@ fun FileExplorerSheet(
 
                 Button(
                     onClick = onCreateNewFileClicked,
-                    colors = ButtonDefaults.buttonColors(containerColor = CyanAccent, contentColor = IdeBackground),
-                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = TextPrimary, contentColor = DarkBg),
+                    shape = RoundedCornerShape(6.dp),
                     contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
                     modifier = Modifier.height(32.dp).testTag("add_file_btn")
                 ) {
@@ -180,25 +183,19 @@ fun FileExplorerSheet(
                     val isActive = file.id == activeFileId
                     val icon = when {
                         file.isPython -> Icons.Default.Code
-                        file.isEnv -> Icons.Default.VpnKey
+                        file.isEnv -> Icons.Default.Lock
                         file.isRequirements -> Icons.Default.ListAlt
                         else -> Icons.Default.Description
-                    }
-                    val iconTint = when {
-                        file.isPython -> CyanAccent
-                        file.isEnv -> AmberAccent
-                        file.isRequirements -> EmeraldAccent
-                        else -> IndigoAccent
                     }
 
                     Card(
                         shape = RoundedCornerShape(8.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = if (isActive) CyanAccentMuted.copy(alpha = 0.25f) else IdeSurfaceVariant
+                            containerColor = if (isActive) DarkSurfaceHighlight else DarkSurfaceElevated
                         ),
                         border = androidx.compose.foundation.BorderStroke(
                             1.dp,
-                            if (isActive) CyanAccent else IdeBorder
+                            if (isActive) TextSecondary else DarkBorder
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
@@ -217,7 +214,7 @@ fun FileExplorerSheet(
                                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                                 modifier = Modifier.weight(1f)
                             ) {
-                                Icon(icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(20.dp))
+                                Icon(icon, contentDescription = null, tint = if (isActive) TextPrimary else TextMuted, modifier = Modifier.size(20.dp))
                                 Column {
                                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                                         Text(
@@ -229,12 +226,13 @@ fun FileExplorerSheet(
                                         )
                                         if (file.isEntrypoint) {
                                             Surface(
-                                                color = AmberAccent.copy(alpha = 0.2f),
-                                                shape = RoundedCornerShape(4.dp)
+                                                color = DarkSurfaceHighlight,
+                                                shape = RoundedCornerShape(4.dp),
+                                                border = androidx.compose.foundation.BorderStroke(1.dp, DarkBorder)
                                             ) {
                                                 Text(
-                                                    "⭐ main",
-                                                    color = AmberAccent,
+                                                    "★ main",
+                                                    color = TextPrimary,
                                                     fontSize = 9.sp,
                                                     fontWeight = FontWeight.Bold,
                                                     modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
@@ -259,7 +257,7 @@ fun FileExplorerSheet(
                                         Icon(
                                             Icons.Default.StarBorder,
                                             contentDescription = "Сделать точкой входа",
-                                            tint = TextSecondary,
+                                            tint = TextMuted,
                                             modifier = Modifier.size(16.dp)
                                         )
                                     }
@@ -273,7 +271,7 @@ fun FileExplorerSheet(
                                         Icon(
                                             Icons.Default.DeleteOutline,
                                             contentDescription = "Удалить файл",
-                                            tint = RoseAccent,
+                                            tint = TextMuted,
                                             modifier = Modifier.size(16.dp)
                                         )
                                     }

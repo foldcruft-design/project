@@ -56,12 +56,12 @@ fun SnippetCardsSheet(
         }
     }
 
-    val defaultTheme = SyntaxThemes.OneDark
+    val defaultTheme = SyntaxThemes.ObsidianDark
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        containerColor = IdeSurface,
-        dragHandle = { BottomSheetDefaults.DragHandle(color = IdeBorder) }
+        containerColor = DarkSurface,
+        dragHandle = { BottomSheetDefaults.DragHandle(color = DarkBorder) }
     ) {
         Column(
             modifier = Modifier
@@ -76,7 +76,7 @@ fun SnippetCardsSheet(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Icon(Icons.Default.Layers, contentDescription = null, tint = CyanAccent)
+                    Icon(Icons.Default.Layers, contentDescription = null, tint = TextPrimary)
                     Column {
                         Text(
                             "Карточки готового кода",
@@ -107,28 +107,31 @@ fun SnippetCardsSheet(
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
-                    placeholder = { Text("Поиск сниппетов...", fontSize = 13.sp) },
-                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = TextSecondary) },
+                    placeholder = { Text("Поиск сниппетов...", fontSize = 13.sp, color = TextMuted) },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = TextMuted) },
                     modifier = Modifier.weight(1f),
                     singleLine = true,
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = CyanAccent,
-                        unfocusedBorderColor = IdeBorder,
+                        focusedBorderColor = TextPrimary,
+                        unfocusedBorderColor = DarkBorder,
                         focusedTextColor = TextPrimary,
-                        unfocusedTextColor = TextPrimary
+                        unfocusedTextColor = TextPrimary,
+                        focusedContainerColor = DarkSurfaceElevated,
+                        unfocusedContainerColor = DarkSurfaceElevated
                     ),
-                    shape = RoundedCornerShape(10.dp)
+                    shape = RoundedCornerShape(8.dp)
                 )
 
                 Button(
                     onClick = { showGenerateDialog = true },
-                    colors = ButtonDefaults.buttonColors(containerColor = IndigoAccent, contentColor = IdeBackground),
-                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = DarkSurfaceHighlight, contentColor = TextPrimary),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, DarkBorder),
+                    shape = RoundedCornerShape(8.dp),
                     modifier = Modifier.testTag("generate_custom_card_btn")
                 ) {
-                    Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Создать", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Text("Создать", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
                 }
             }
 
@@ -146,13 +149,13 @@ fun SnippetCardsSheet(
                         onClick = { selectedCategory = cat },
                         label = { Text(cat, fontSize = 12.sp) },
                         colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = CyanAccentMuted,
+                            selectedContainerColor = DarkSurfaceHighlight,
                             selectedLabelColor = TextPrimary,
-                            containerColor = IdeSurfaceVariant,
+                            containerColor = DarkSurfaceElevated,
                             labelColor = TextSecondary
                         ),
                         border = FilterChipDefaults.filterChipBorder(
-                            borderColor = if (isSelected) CyanAccent else IdeBorder,
+                            borderColor = if (isSelected) TextPrimary else DarkBorder,
                             enabled = true,
                             selected = isSelected
                         )
@@ -164,17 +167,15 @@ fun SnippetCardsSheet(
 
             // Cards list
             LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(14.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(bottom = 32.dp)
             ) {
                 items(filteredCards) { card ->
                     Card(
-                        shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(containerColor = IdeSurfaceVariant),
-                        border = CardDefaults.outlinedCardBorder().copy(
-                            brush = androidx.compose.ui.graphics.SolidColor(IdeBorder)
-                        ),
+                        shape = RoundedCornerShape(10.dp),
+                        colors = CardDefaults.cardColors(containerColor = DarkSurfaceElevated),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, DarkBorder),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Column(modifier = Modifier.padding(14.dp)) {
@@ -191,13 +192,13 @@ fun SnippetCardsSheet(
                                     fontWeight = FontWeight.Bold
                                 )
                                 Surface(
-                                    color = IdeBackground,
-                                    shape = RoundedCornerShape(6.dp),
-                                    border = androidx.compose.foundation.BorderStroke(1.dp, IdeBorder)
+                                    color = DarkBg,
+                                    shape = RoundedCornerShape(4.dp),
+                                    border = androidx.compose.foundation.BorderStroke(1.dp, DarkBorder)
                                 ) {
                                     Text(
                                         card.targetFileSuggestion,
-                                        color = CyanAccent,
+                                        color = TextSecondary,
                                         fontSize = 11.sp,
                                         fontWeight = FontWeight.Medium,
                                         modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
@@ -221,8 +222,8 @@ fun SnippetCardsSheet(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clip(RoundedCornerShape(8.dp))
-                                    .background(defaultTheme.editorBackground)
-                                    .border(1.dp, IdeBorder, RoundedCornerShape(8.dp))
+                                    .background(DarkBg)
+                                    .border(1.dp, DarkBorder, RoundedCornerShape(8.dp))
                                     .padding(10.dp)
                             ) {
                                 Text(
@@ -243,10 +244,10 @@ fun SnippetCardsSheet(
                                 Button(
                                     onClick = { onInsertSnippet(card.code, card.targetFileSuggestion) },
                                     colors = ButtonDefaults.buttonColors(
-                                        containerColor = CyanAccent,
-                                        contentColor = IdeBackground
+                                        containerColor = TextPrimary,
+                                        contentColor = DarkBg
                                     ),
-                                    shape = RoundedCornerShape(8.dp),
+                                    shape = RoundedCornerShape(6.dp),
                                     modifier = Modifier.weight(1f).testTag("insert_card_${card.id}")
                                 ) {
                                     Icon(Icons.Default.ContentPaste, contentDescription = null, modifier = Modifier.size(14.dp))
@@ -256,13 +257,11 @@ fun SnippetCardsSheet(
 
                                 OutlinedButton(
                                     onClick = { onCreateAsNewFile(card.targetFileSuggestion, card.code) },
-                                    shape = RoundedCornerShape(8.dp),
+                                    shape = RoundedCornerShape(6.dp),
                                     colors = ButtonDefaults.outlinedButtonColors(contentColor = TextPrimary),
-                                    border = ButtonDefaults.outlinedButtonBorder.copy(
-                                        brush = androidx.compose.ui.graphics.SolidColor(IdeBorder)
-                                    )
+                                    border = androidx.compose.foundation.BorderStroke(1.dp, DarkBorder)
                                 ) {
-                                    Icon(Icons.Default.NoteAdd, contentDescription = null, modifier = Modifier.size(14.dp), tint = IndigoAccent)
+                                    Icon(Icons.Default.NoteAdd, contentDescription = null, modifier = Modifier.size(14.dp), tint = TextSecondary)
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Text("Создать файл", fontSize = 12.sp)
                                 }
@@ -283,7 +282,7 @@ fun SnippetCardsSheet(
 
         AlertDialog(
             onDismissRequest = { showGenerateDialog = false },
-            containerColor = IdeSurface,
+            containerColor = DarkSurface,
             title = {
                 Text("Генератор карточки кода", color = TextPrimary, fontWeight = FontWeight.Bold)
             },
@@ -294,43 +293,49 @@ fun SnippetCardsSheet(
                     OutlinedTextField(
                         value = cardTitle,
                         onValueChange = { cardTitle = it },
-                        label = { Text("Название карточки (напр. Обработчик фото)") },
+                        label = { Text("Название карточки", color = TextSecondary) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = CyanAccent,
-                            unfocusedBorderColor = IdeBorder,
+                            focusedBorderColor = TextPrimary,
+                            unfocusedBorderColor = DarkBorder,
                             focusedTextColor = TextPrimary,
-                            unfocusedTextColor = TextPrimary
+                            unfocusedTextColor = TextPrimary,
+                            focusedContainerColor = DarkSurfaceElevated,
+                            unfocusedContainerColor = DarkSurfaceElevated
                         )
                     )
 
                     OutlinedTextField(
                         value = cardTargetFile,
                         onValueChange = { cardTargetFile = it },
-                        label = { Text("Целевой файл (напр. handlers.py)") },
+                        label = { Text("Целевой файл (handlers.py)", color = TextSecondary) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = CyanAccent,
-                            unfocusedBorderColor = IdeBorder,
+                            focusedBorderColor = TextPrimary,
+                            unfocusedBorderColor = DarkBorder,
                             focusedTextColor = TextPrimary,
-                            unfocusedTextColor = TextPrimary
+                            unfocusedTextColor = TextPrimary,
+                            focusedContainerColor = DarkSurfaceElevated,
+                            unfocusedContainerColor = DarkSurfaceElevated
                         )
                     )
 
                     OutlinedTextField(
                         value = cardSnippet,
                         onValueChange = { cardSnippet = it },
-                        label = { Text("Python код карточки") },
+                        label = { Text("Python код карточки", color = TextSecondary) },
                         minLines = 4,
                         maxLines = 8,
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = CyanAccent,
-                            unfocusedBorderColor = IdeBorder,
+                            focusedBorderColor = TextPrimary,
+                            unfocusedBorderColor = DarkBorder,
                             focusedTextColor = TextPrimary,
-                            unfocusedTextColor = TextPrimary
+                            unfocusedTextColor = TextPrimary,
+                            focusedContainerColor = DarkSurfaceElevated,
+                            unfocusedContainerColor = DarkSurfaceElevated
                         )
                     )
                 }
@@ -351,9 +356,9 @@ fun SnippetCardsSheet(
                             showGenerateDialog = false
                         }
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = CyanAccent, contentColor = IdeBackground)
+                    colors = ButtonDefaults.buttonColors(containerColor = TextPrimary, contentColor = DarkBg)
                 ) {
-                    Text("Сохранить карточку", fontWeight = FontWeight.Bold)
+                    Text("Сохранить", fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {

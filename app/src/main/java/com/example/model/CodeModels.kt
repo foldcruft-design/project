@@ -72,93 +72,93 @@ data class SyntaxTheme(
 )
 
 object SyntaxThemes {
-    val OneDark = SyntaxTheme(
-        id = "one_dark",
-        name = "One Dark Pro",
-        editorBackground = Color(0xFF1E222B),
-        lineNumbersColor = Color(0xFF5C6370),
-        cursorColor = Color(0xFF528BFF),
-        keywordColor = Color(0xFFE06C75),
-        stringColor = Color(0xFF98C379),
-        functionColor = Color(0xFF61AFEF),
-        numberColor = Color(0xFFD19A66),
-        commentColor = Color(0xFF5C6370),
-        decoratorColor = Color(0xFFC678DD),
-        operatorColor = Color(0xFF56B6C2),
-        variableColor = Color(0xFFABB2BF)
+    val ObsidianDark = SyntaxTheme(
+        id = "obsidian_dark",
+        name = "Obsidian Dark",
+        editorBackground = Color(0xFF090A0F),
+        lineNumbersColor = Color(0xFF4B5563),
+        cursorColor = Color(0xFFF3F4F6),
+        keywordColor = Color(0xFFF9FAFB),
+        stringColor = Color(0xFF9CA3AF),
+        functionColor = Color(0xFFE5E7EB),
+        numberColor = Color(0xFFD1D5DB),
+        commentColor = Color(0xFF6B7280),
+        decoratorColor = Color(0xFFE5E7EB),
+        operatorColor = Color(0xFF9CA3AF),
+        variableColor = Color(0xFFF3F4F6)
     )
 
-    val Dracula = SyntaxTheme(
-        id = "dracula",
-        name = "Dracula Midnight",
-        editorBackground = Color(0xFF21222C),
-        lineNumbersColor = Color(0xFF6272A4),
-        cursorColor = Color(0xFFFF79C6),
-        keywordColor = Color(0xFFFF79C6),
-        stringColor = Color(0xFFF1FA8C),
-        functionColor = Color(0xFF50FA7B),
-        numberColor = Color(0xFFBD93F9),
-        commentColor = Color(0xFF6272A4),
-        decoratorColor = Color(0xFFFFB86C),
-        operatorColor = Color(0xFFFF79C6),
-        variableColor = Color(0xFFF8F8F2)
+    val JetBlackOLED = SyntaxTheme(
+        id = "jet_black_oled",
+        name = "Jet Black OLED",
+        editorBackground = Color(0xFF000000),
+        lineNumbersColor = Color(0xFF404040),
+        cursorColor = Color(0xFFFFFFFF),
+        keywordColor = Color(0xFFFFFFFF),
+        stringColor = Color(0xFFA3A3A3),
+        functionColor = Color(0xFFE5E5E5),
+        numberColor = Color(0xFFD4D4D4),
+        commentColor = Color(0xFF525252),
+        decoratorColor = Color(0xFFFFFFFF),
+        operatorColor = Color(0xFFA3A3A3),
+        variableColor = Color(0xFFF5F5F5)
     )
 
-    val Monokai = SyntaxTheme(
-        id = "monokai",
-        name = "Monokai Retro",
-        editorBackground = Color(0xFF191919),
-        lineNumbersColor = Color(0xFF75715E),
-        cursorColor = Color(0xFFF8F8F0),
-        keywordColor = Color(0xFFF92672),
-        stringColor = Color(0xFFE6DB74),
-        functionColor = Color(0xFFA6E22E),
-        numberColor = Color(0xFFAE81FF),
-        commentColor = Color(0xFF75715E),
-        decoratorColor = Color(0xFF66D9EF),
-        operatorColor = Color(0xFFF92672),
-        variableColor = Color(0xFFF8F8F2)
+    val CharcoalStealth = SyntaxTheme(
+        id = "charcoal_stealth",
+        name = "Charcoal Stealth",
+        editorBackground = Color(0xFF11141A),
+        lineNumbersColor = Color(0xFF475569),
+        cursorColor = Color(0xFFE2E8F0),
+        keywordColor = Color(0xFFF8FAFC),
+        stringColor = Color(0xFF94A3B8),
+        functionColor = Color(0xFFCBD5E1),
+        numberColor = Color(0xFFCBD5E1),
+        commentColor = Color(0xFF64748B),
+        decoratorColor = Color(0xFFF1F5F9),
+        operatorColor = Color(0xFF94A3B8),
+        variableColor = Color(0xFFE2E8F0)
     )
 
-    val Cyberpunk = SyntaxTheme(
-        id = "cyberpunk",
-        name = "Cyberpunk Neon",
-        editorBackground = Color(0xFF0F111A),
-        lineNumbersColor = Color(0xFF495166),
-        cursorColor = Color(0xFF00FFFF),
-        keywordColor = Color(0xFFFF007F),
-        stringColor = Color(0xFF00FFA3),
-        functionColor = Color(0xFF00E5FF),
-        numberColor = Color(0xFFFFD600),
-        commentColor = Color(0xFF495166),
-        decoratorColor = Color(0xFFB388FF),
-        operatorColor = Color(0xFFFF5252),
-        variableColor = Color(0xFFE0E6ED)
+    val GraphiteMinimal = SyntaxTheme(
+        id = "graphite_minimal",
+        name = "Graphite Minimal",
+        editorBackground = Color(0xFF151821),
+        lineNumbersColor = Color(0xFF4B5563),
+        cursorColor = Color(0xFFF9FAFB),
+        keywordColor = Color(0xFFFFFFFF),
+        stringColor = Color(0xFFA1A1AA),
+        functionColor = Color(0xFFE4E4E7),
+        numberColor = Color(0xFFD4D4D8),
+        commentColor = Color(0xFF71717A),
+        decoratorColor = Color(0xFFF4F4F5),
+        operatorColor = Color(0xFFA1A1AA),
+        variableColor = Color(0xFFFAFAFA)
     )
 
-    val Nord = SyntaxTheme(
-        id = "nord",
-        name = "Nord Frost",
-        editorBackground = Color(0xFF2E3440),
-        lineNumbersColor = Color(0xFF4C566A),
-        cursorColor = Color(0xFF88C0D0),
-        keywordColor = Color(0xFF81A1C1),
-        stringColor = Color(0xFFA3BE8C),
-        functionColor = Color(0xFF88C0D0),
-        numberColor = Color(0xFFB48EAD),
-        commentColor = Color(0xFF616E88),
-        decoratorColor = Color(0xFFD08770),
-        operatorColor = Color(0xFF81A1C1),
-        variableColor = Color(0xFFECEFF4)
+    val SlateDark = SyntaxTheme(
+        id = "slate_dark",
+        name = "Slate Dark",
+        editorBackground = Color(0xFF0E1117),
+        lineNumbersColor = Color(0xFF475569),
+        cursorColor = Color(0xFFF8FAFC),
+        keywordColor = Color(0xFFF1F5F9),
+        stringColor = Color(0xFF94A3B8),
+        functionColor = Color(0xFFE2E8F0),
+        numberColor = Color(0xFFCBD5E1),
+        commentColor = Color(0xFF64748B),
+        decoratorColor = Color(0xFFF8FAFC),
+        operatorColor = Color(0xFF94A3B8),
+        variableColor = Color(0xFFF1F5F9)
     )
 
-    val allThemes = listOf(OneDark, Dracula, Monokai, Cyberpunk, Nord)
+    val allThemes = listOf(ObsidianDark, JetBlackOLED, CharcoalStealth, GraphiteMinimal, SlateDark)
     
-    fun getById(id: String): SyntaxTheme = allThemes.find { it.id == id } ?: OneDark
+    fun getById(id: String): SyntaxTheme = allThemes.find { it.id == id } ?: ObsidianDark
 }
 
 data class EditorSettings(
-    val themeId: String = "one_dark",
+    val themeId: String = "obsidian_dark",
     val fontSizeSp: Int = 14,
     val showLineNumbers: Boolean = true,
     val wordWrap: Boolean = false,

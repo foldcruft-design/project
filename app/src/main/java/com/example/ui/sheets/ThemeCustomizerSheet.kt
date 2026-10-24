@@ -38,7 +38,7 @@ fun ThemeCustomizerSheet(
 ) {
     val currentTheme = SyntaxThemes.getById(settings.themeId)
 
-    val previewCode = """# Демо синтаксиса для темы
+    val previewCode = """# Демо синтаксиса (Dark Stealth)
 @bot.message(Command("start"))
 def handle_user(name: str) -> dict:
     active = True
@@ -49,8 +49,8 @@ def handle_user(name: str) -> dict:
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        containerColor = IdeSurface,
-        dragHandle = { BottomSheetDefaults.DragHandle(color = IdeBorder) }
+        containerColor = DarkSurface,
+        dragHandle = { BottomSheetDefaults.DragHandle(color = DarkBorder) }
     ) {
         Column(
             modifier = Modifier
@@ -65,9 +65,9 @@ def handle_user(name: str) -> dict:
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Icon(Icons.Default.FormatPaint, contentDescription = null, tint = CyanAccent)
+                    Icon(Icons.Default.FormatPaint, contentDescription = null, tint = TextPrimary)
                     Text(
-                        "Темы и цвета кода",
+                        "Темные палитры кода",
                         style = MaterialTheme.typography.titleMedium,
                         color = TextPrimary,
                         fontWeight = FontWeight.Bold
@@ -82,7 +82,7 @@ def handle_user(name: str) -> dict:
 
             // Theme selector cards
             Text(
-                "ЦВЕТОВАЯ ПАЛИТРА СИНТАКСИСА",
+                "ТЕМНЫЕ СТИЛИ СИНТАКСИСА",
                 style = MaterialTheme.typography.labelSmall,
                 color = TextSecondary,
                 fontWeight = FontWeight.Bold,
@@ -91,7 +91,7 @@ def handle_user(name: str) -> dict:
             Spacer(modifier = Modifier.height(10.dp))
 
             LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 items(SyntaxThemes.allThemes) { theme ->
@@ -99,12 +99,12 @@ def handle_user(name: str) -> dict:
                     Box(
                         modifier = Modifier
                             .width(140.dp)
-                            .clip(RoundedCornerShape(12.dp))
+                            .clip(RoundedCornerShape(10.dp))
                             .background(theme.editorBackground)
                             .border(
-                                width = if (isSelected) 2.dp else 1.dp,
-                                color = if (isSelected) CyanAccent else IdeBorder,
-                                shape = RoundedCornerShape(12.dp)
+                                width = if (isSelected) 1.5.dp else 1.dp,
+                                color = if (isSelected) TextPrimary else DarkBorder,
+                                shape = RoundedCornerShape(10.dp)
                             )
                             .clickable {
                                 onSettingsChanged(settings.copy(themeId = theme.id))
@@ -128,18 +128,18 @@ def handle_user(name: str) -> dict:
                                     Icon(
                                         Icons.Default.Check,
                                         contentDescription = null,
-                                        tint = CyanAccent,
+                                        tint = TextPrimary,
                                         modifier = Modifier.size(16.dp)
                                     )
                                 }
                             }
                             Spacer(modifier = Modifier.height(8.dp))
-                            // Palette swatches
+                            // Monochromatic swatches
                             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                                 Box(modifier = Modifier.size(14.dp).clip(RoundedCornerShape(3.dp)).background(theme.keywordColor))
                                 Box(modifier = Modifier.size(14.dp).clip(RoundedCornerShape(3.dp)).background(theme.stringColor))
-                                Box(modifier = Modifier.size(14.dp).clip(RoundedCornerShape(3.dp)).background(theme.functionColor))
-                                Box(modifier = Modifier.size(14.dp).clip(RoundedCornerShape(3.dp)).background(theme.numberColor))
+                                Box(modifier = Modifier.size(14.dp).clip(RoundedCornerShape(3.dp)).background(theme.commentColor))
+                                Box(modifier = Modifier.size(14.dp).clip(RoundedCornerShape(3.dp)).background(theme.lineNumbersColor))
                             }
                         }
                     }
@@ -163,7 +163,7 @@ def handle_user(name: str) -> dict:
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(10.dp))
                     .background(currentTheme.editorBackground)
-                    .border(1.dp, IdeBorder, RoundedCornerShape(10.dp))
+                    .border(1.dp, DarkBorder, RoundedCornerShape(10.dp))
                     .padding(12.dp)
             ) {
                 Text(
@@ -183,7 +183,7 @@ def handle_user(name: str) -> dict:
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text("Размер шрифта", color = TextPrimary, fontSize = 14.sp)
-                Text("${settings.fontSizeSp} sp", color = CyanAccent, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                Text("${settings.fontSizeSp} sp", color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 14.sp)
             }
             Slider(
                 value = settings.fontSizeSp.toFloat(),
@@ -191,9 +191,9 @@ def handle_user(name: str) -> dict:
                 valueRange = 11f..22f,
                 steps = 11,
                 colors = SliderDefaults.colors(
-                    thumbColor = CyanAccent,
-                    activeTrackColor = CyanAccent,
-                    inactiveTrackColor = IdeBorder
+                    thumbColor = TextPrimary,
+                    activeTrackColor = TextPrimary,
+                    inactiveTrackColor = DarkBorder
                 ),
                 modifier = Modifier.testTag("font_size_slider")
             )
@@ -216,8 +216,10 @@ def handle_user(name: str) -> dict:
                     checked = settings.showLineNumbers,
                     onCheckedChange = { onSettingsChanged(settings.copy(showLineNumbers = it)) },
                     colors = SwitchDefaults.colors(
-                        checkedThumbColor = IdeBackground,
-                        checkedTrackColor = CyanAccent
+                        checkedThumbColor = DarkBg,
+                        checkedTrackColor = TextPrimary,
+                        uncheckedThumbColor = TextMuted,
+                        uncheckedTrackColor = DarkSurfaceElevated
                     )
                 )
             }
@@ -237,8 +239,10 @@ def handle_user(name: str) -> dict:
                     checked = settings.wordWrap,
                     onCheckedChange = { onSettingsChanged(settings.copy(wordWrap = it)) },
                     colors = SwitchDefaults.colors(
-                        checkedThumbColor = IdeBackground,
-                        checkedTrackColor = CyanAccent
+                        checkedThumbColor = DarkBg,
+                        checkedTrackColor = TextPrimary,
+                        uncheckedThumbColor = TextMuted,
+                        uncheckedTrackColor = DarkSurfaceElevated
                     )
                 )
             }

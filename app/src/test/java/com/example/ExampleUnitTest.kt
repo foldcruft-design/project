@@ -16,7 +16,7 @@ class ExampleUnitTest {
     fun `default telegram bot project has required multi-file architecture`() {
         val botProject = DefaultProjects.telegramBotProject
         assertEquals("Telegram Bot Pro", botProject.name)
-        assertTrue(botProject.files.size >= 4)
+        assertTrue(botProject.files.size >= 5)
 
         val fileNames = botProject.files.map { it.name }
         assertTrue("Project must contain main.py", fileNames.contains("main.py"))
@@ -25,6 +25,7 @@ class ExampleUnitTest {
         assertTrue("Project must contain config.py", fileNames.contains("config.py"))
         assertTrue("Project must contain requirements.txt", fileNames.contains("requirements.txt"))
         assertTrue("Project must contain .env", fileNames.contains(".env"))
+        assertTrue("Project must contain android.yml", fileNames.contains("android.yml"))
     }
 
     @Test
@@ -38,13 +39,13 @@ class ExampleUnitTest {
     }
 
     @Test
-    fun `syntax themes exist and have contrasting colors`() {
+    fun `dark syntax themes exist and have high contrast`() {
         val themes = SyntaxThemes.allThemes
         assertTrue(themes.size >= 5)
-        val oneDark = SyntaxThemes.getById("one_dark")
-        assertEquals("One Dark Pro", oneDark.name)
-        assertNotNull(oneDark.keywordColor)
-        assertNotNull(oneDark.stringColor)
+        val obsidian = SyntaxThemes.getById("obsidian_dark")
+        assertEquals("Obsidian Dark", obsidian.name)
+        assertNotNull(obsidian.keywordColor)
+        assertNotNull(obsidian.stringColor)
     }
 
     @Test
@@ -67,10 +68,10 @@ class ExampleUnitTest {
     }
 
     @Test
-    fun `github actions hub contains android apk compilation workflow`() {
+    fun `github actions hub contains android yml apk compilation workflow`() {
         val apkWorkflow = GitHubActionsHub.androidApkWorkflow
         assertTrue(apkWorkflow.ymlContent.contains("assembleDebug"))
         assertTrue(apkWorkflow.ymlContent.contains("upload-artifact"))
-        assertTrue(apkWorkflow.fileName.contains("build-apk.yml"))
+        assertTrue(apkWorkflow.fileName.contains("android.yml"))
     }
 }

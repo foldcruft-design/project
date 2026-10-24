@@ -158,13 +158,58 @@ ENVIRONMENT=development
 """
         )
 
+        val androidYmlFile = CodeFile(
+            id = "file_tg_android_yml",
+            projectId = projId,
+            name = "android.yml",
+            isEntrypoint = false,
+            content = """name: Android CI - Build APK
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build & Package APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build Debug APK with Gradle
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Upload Debug APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PocketCode-Debug-APK
+          path: app/build/outputs/apk/debug/*.apk
+          retention-days: 30
+"""
+        )
+
         Project(
             id = projId,
             name = "Telegram Bot Pro",
             description = "Модульный бот с разделением на config.py, handlers.py, keyboards.py",
             language = "python",
             activeFileId = mainFileId,
-            files = listOf(mainPy, handlersPy, keyboardsPy, configPy, requirementsTxt, envFile),
+            files = listOf(mainPy, handlersPy, keyboardsPy, configPy, requirementsTxt, envFile, androidYmlFile),
             installedPackages = listOf("aiogram", "python-dotenv", "aiohttp", "pydantic")
         )
     }
