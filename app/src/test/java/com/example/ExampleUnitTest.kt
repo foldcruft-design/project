@@ -2,10 +2,12 @@ package com.example
 
 import com.example.data.DefaultProjects
 import com.example.data.PackageCatalog
-import com.example.engine.TelegramBotSimulator
+import com.example.engine.MultiFileExecutor
 import com.example.github.GitHubActionsHub
+import com.example.model.CodeFile
+import com.example.model.ConsoleEntry
+import com.example.model.Project
 import com.example.model.SyntaxThemes
-import com.example.snippets.SnippetLibrary
 import com.example.ui.components.FileTypeHelper
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
@@ -14,27 +16,13 @@ import org.junit.Test
 class ExampleUnitTest {
 
     @Test
-    fun `blank project starts with completely empty files`() {
-        val blank = DefaultProjects.blankProject
-        assertEquals("Чистый проект", blank.name)
-        assertTrue(blank.files.isNotEmpty())
-        assertTrue("main.py in blank project should be empty", blank.files.first().content.isEmpty())
-    }
-
-    @Test
-    fun `default telegram bot project has required multi-file architecture`() {
-        val botProject = DefaultProjects.telegramBotProject
-        assertEquals("Telegram Bot Pro", botProject.name)
-        assertTrue(botProject.files.size >= 5)
-
-        val fileNames = botProject.files.map { it.name }
-        assertTrue("Project must contain main.py", fileNames.contains("main.py"))
-        assertTrue("Project must contain handlers.py", fileNames.contains("handlers.py"))
-        assertTrue("Project must contain keyboards.py", fileNames.contains("keyboards.py"))
-        assertTrue("Project must contain config.py", fileNames.contains("config.py"))
-        assertTrue("Project must contain requirements.txt", fileNames.contains("requirements.txt"))
-        assertTrue("Project must contain .env", fileNames.contains(".env"))
-        assertTrue("Project must contain android.yml", fileNames.contains("android.yml"))
+    fun `starter project has 1 clean main py file`() {
+        val starter = DefaultProjects.starterProject
+        assertEquals("Python Project", starter.name)
+        assertEquals(1, starter.files.size)
+        assertEquals("main.py", starter.files.first().name)
+        assertTrue("main.py must be entrypoint", starter.files.first().isEntrypoint)
+        assertTrue("Starter code should not be empty", starter.files.first().content.isNotEmpty())
     }
 
     @Test
@@ -42,6 +30,7 @@ class ExampleUnitTest {
         assertEquals("Py", FileTypeHelper.getLanguageBadge("main.py").label)
         assertEquals("Java", FileTypeHelper.getLanguageBadge("App.java").label)
         assertEquals("C++", FileTypeHelper.getLanguageBadge("main.cpp").label)
+        assertEquals("C", FileTypeHelper.getLanguageBadge("main.c").label)
         assertEquals("JS", FileTypeHelper.getLanguageBadge("index.js").label)
         assertEquals("TS", FileTypeHelper.getLanguageBadge("app.ts").label)
         assertEquals("YAML", FileTypeHelper.getLanguageBadge("android.yml").label)
@@ -56,24 +45,47 @@ class ExampleUnitTest {
     }
 
     @Test
-    fun `package catalog contains essential bot and web libraries`() {
+    fun `package catalog contains essential programming and web libraries`() {
         val packages = PackageCatalog.curatedPackages
         val names = packages.map { it.name }
-        assertTrue(names.contains("aiogram"))
-        assertTrue(names.contains("python-dotenv"))
-        assertTrue(names.contains("fastapi"))
         assertTrue(names.contains("requests"))
+        assertTrue(names.contains("colorama"))
+        assertTrue(names.contains("fastapi"))
     }
 
     @Test
-    fun `bot simulator handles start command and callback queries`() = runBlocking {
-        val simulator = TelegramBotSimulator(DefaultProjects.telegramBotProject)
-        val reply = simulator.handleUserMessage("/start") {}
-        assertTrue(reply.text.contains("Привет"))
-        assertTrue(reply.inlineButtons.isNotEmpty())
+    fun `executor runs python code and calculates statistics`() = runBlocking {
+        val executor = MultiFileExecutor()
+        val testProject = Project(
+            id = "test_run",
+            name = "Test Run",
+            description = "Run test",
+            activeFileId = "f1",
+            files = listOf(
+                CodeFile(
+                    id = "f1",
+                    projectId = "test_run",
+                    name = "main.py",
+                    isEntrypoint = true,
+                    content = """
+def add(a, b):
+    return a + b
 
-        val callbackResult = simulator.handleCallbackClick("action_stats") {}
-        assertTrue(callbackResult.contains("Статистика"))
+print("Sum is:", add(15, 25))
+"""
+                )
+            ),
+            installedPackages = emptyList()
+        )
+
+        val logs = mutableListOf<ConsoleEntry>()
+        executor.runProject(testProject) { log ->
+            logs.add(log)
+        }
+
+        assertTrue("Logs should be emitted", logs.isNotEmpty())
+        val sumLog = logs.find { it.text.contains("Sum is: 40") }
+        assertNotNull("Calculated sum should be printed", sumLog)
     }
 
     @Test

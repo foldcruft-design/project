@@ -55,15 +55,15 @@ fun FileLanguageIcon(
     val badge = FileTypeHelper.getLanguageBadge(fileName)
     Box(
         modifier = modifier
-            .size(18.dp)
-            .clip(RoundedCornerShape(4.dp))
-            .background(badge.iconColor.copy(alpha = 0.2f))
-            .border(1.dp, badge.iconColor.copy(alpha = 0.6f), RoundedCornerShape(4.dp)),
+            .size(15.dp)
+            .clip(RoundedCornerShape(3.dp))
+            .background(badge.iconColor.copy(alpha = 0.25f))
+            .border(0.8.dp, badge.iconColor.copy(alpha = 0.7f), RoundedCornerShape(3.dp)),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = badge.label,
-            fontSize = if (badge.label.length > 2) 7.sp else 9.sp,
+            fontSize = if (badge.label.length > 2) 6.sp else 8.sp,
             fontWeight = FontWeight.Bold,
             fontFamily = FontFamily.Monospace,
             color = badge.iconColor

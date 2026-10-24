@@ -52,7 +52,7 @@ fun PipTerminalSheet(
         }
     }
 
-    val quickPackages = listOf("aiogram", "python-telegram-bot", "fastapi", "uvicorn", "requests", "aiohttp", "pydantic", "colorama")
+    val popularPackages = listOf("requests", "colorama", "numpy", "pandas", "fastapi", "aiohttp", "pydantic", "beautifulsoup4")
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -62,8 +62,8 @@ fun PipTerminalSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.92f)
-                .padding(horizontal = 16.dp)
+                .fillMaxHeight(0.72f)
+                .padding(horizontal = 12.dp, vertical = 2.dp)
         ) {
             // Header
             Row(
@@ -71,10 +71,10 @@ fun PipTerminalSheet(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     Surface(
                         color = Color(0xFF3572A5).copy(alpha = 0.2f),
-                        shape = RoundedCornerShape(6.dp),
+                        shape = RoundedCornerShape(4.dp),
                         border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF3572A5))
                     ) {
                         Text(
@@ -82,93 +82,99 @@ fun PipTerminalSheet(
                             color = Color(0xFF38BDF8),
                             fontFamily = FontFamily.Monospace,
                             fontWeight = FontWeight.Bold,
-                            fontSize = 12.sp,
-                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                            fontSize = 11.sp,
+                            modifier = Modifier.padding(horizontal = 5.dp, vertical = 1.dp)
                         )
                     }
                     Column {
                         Text(
-                            "Терминал библиотек (Pip)",
-                            style = MaterialTheme.typography.titleMedium,
+                            "Менеджер библиотек (Pip)",
+                            fontSize = 13.sp,
                             color = TextPrimary,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            "Установлено: ${installedPackages.size} пакетов в virtualenv",
-                            style = MaterialTheme.typography.bodySmall,
+                            "VirtualEnv: ${installedPackages.size} пакетов",
+                            fontSize = 10.sp,
                             color = TextSecondary
                         )
                     }
                 }
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = onClearLogs) {
-                        Icon(Icons.Default.ClearAll, contentDescription = "Очистить", tint = TextSecondary)
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                    IconButton(
+                        onClick = onClearLogs,
+                        modifier = Modifier.size(28.dp).testTag("clear_pip_logs_btn")
+                    ) {
+                        Icon(Icons.Default.ClearAll, contentDescription = "Очистить", tint = TextSecondary, modifier = Modifier.size(15.dp))
                     }
-                    IconButton(onClick = onDismiss, modifier = Modifier.testTag("close_pip_terminal")) {
-                        Icon(Icons.Default.Close, contentDescription = "Закрыть", tint = TextSecondary)
+                    IconButton(
+                        onClick = onDismiss,
+                        modifier = Modifier.size(28.dp).testTag("close_pip_terminal")
+                    ) {
+                        Icon(Icons.Default.Close, contentDescription = "Закрыть", tint = TextSecondary, modifier = Modifier.size(16.dp))
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
-            // Quick pip install chips
+            // Quick pip chips
             LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 item {
                     Surface(
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(10.dp),
                         color = DarkSurfaceHighlight,
                         border = androidx.compose.foundation.BorderStroke(1.dp, DarkBorder),
                         modifier = Modifier.clickable { onRunPipCommand("pip list") }
                     ) {
                         Text(
-                            "📋 pip list",
-                            fontSize = 11.sp,
+                            "pip list",
+                            fontSize = 10.5.sp,
                             color = TextPrimary,
                             fontFamily = FontFamily.Monospace,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp)
                         )
                     }
                 }
-                items(quickPackages) { pkg ->
+                items(popularPackages) { pkg ->
                     val isInstalled = installedPackages.contains(pkg)
                     Surface(
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(10.dp),
                         color = if (isInstalled) DarkSurfaceElevated else DarkSurfaceHighlight,
                         border = androidx.compose.foundation.BorderStroke(1.dp, if (isInstalled) Color(0xFF3FB950) else DarkBorder),
                         modifier = Modifier.clickable { onInstallPackage(pkg) }
                     ) {
                         Text(
                             if (isInstalled) "✓ $pkg" else "+ $pkg",
-                            fontSize = 11.sp,
+                            fontSize = 10.5.sp,
                             color = if (isInstalled) Color(0xFF3FB950) else TextPrimary,
                             fontFamily = FontFamily.Monospace,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp)
                         )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
-            // Pip Terminal Output Canvas
+            // Terminal logs canvas
             Box(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
+                    .clip(RoundedCornerShape(6.dp))
                     .background(DarkBg)
-                    .border(1.dp, DarkBorder, RoundedCornerShape(8.dp))
-                    .padding(10.dp)
+                    .border(1.dp, DarkBorder, RoundedCornerShape(6.dp))
+                    .padding(8.dp)
             ) {
                 LazyColumn(
                     state = listState,
                     modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(3.dp)
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
                     items(logs) { entry ->
                         val color = when (entry.type) {
@@ -182,27 +188,28 @@ fun PipTerminalSheet(
                             text = entry.text,
                             fontFamily = FontFamily.Monospace,
                             fontSize = 11.sp,
-                            lineHeight = 15.sp,
+                            lineHeight = 14.sp,
                             color = color
                         )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
             // Command input row: `pip install <pkg>`
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 OutlinedTextField(
                     value = inputCommand,
                     onValueChange = { inputCommand = it },
-                    placeholder = { Text("pip install <библиотека>", fontSize = 12.sp, color = TextMuted) },
+                    placeholder = { Text("pip install <библиотека>", fontSize = 11.sp, color = TextMuted) },
                     modifier = Modifier
                         .weight(1f)
+                        .height(44.dp)
                         .testTag("pip_terminal_input"),
                     singleLine = true,
                     colors = OutlinedTextFieldDefaults.colors(
@@ -213,7 +220,7 @@ fun PipTerminalSheet(
                         focusedContainerColor = DarkSurfaceElevated,
                         unfocusedContainerColor = DarkSurfaceElevated
                     ),
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(6.dp)
                 )
 
                 Button(
@@ -226,17 +233,15 @@ fun PipTerminalSheet(
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = TextPrimary, contentColor = DarkBg),
-                    shape = RoundedCornerShape(8.dp),
-                    enabled = inputCommand.isNotBlank(),
-                    modifier = Modifier.testTag("pip_terminal_submit_btn")
+                    shape = RoundedCornerShape(6.dp),
+                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 2.dp),
+                    modifier = Modifier.height(40.dp).testTag("pip_terminal_submit_btn")
                 ) {
-                    Icon(Icons.Default.PlayArrow, contentDescription = null, modifier = Modifier.size(16.dp))
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("Выполнить", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Text("Установить", fontSize = 11.sp, fontWeight = FontWeight.Bold)
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }

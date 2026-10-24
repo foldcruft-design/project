@@ -3,9 +3,7 @@ package com.example.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.data.DefaultProjects
-import com.example.data.PackageCatalog
 import com.example.engine.MultiFileExecutor
-import com.example.engine.TelegramBotSimulator
 import com.example.github.GitHubActionsHub
 import com.example.model.*
 import kotlinx.coroutines.delay
@@ -24,7 +22,6 @@ enum class ActiveSheet {
     FILE_EXPLORER,
     EXECUTION_TERMINAL,
     PIP_TERMINAL,
-    BOT_SIMULATOR,
     CREATE_FILE_DIALOG,
     CREATE_PROJECT_DIALOG
 }
@@ -36,22 +33,22 @@ class CodeStudioViewModel : ViewModel() {
     private val _projects = MutableStateFlow<List<Project>>(DefaultProjects.defaultProjects)
     val projects: StateFlow<List<Project>> = _projects.asStateFlow()
 
-    private val _currentProjectId = MutableStateFlow(DefaultProjects.blankProject.id)
+    private val _currentProjectId = MutableStateFlow(DefaultProjects.starterProject.id)
     val currentProjectId: StateFlow<String> = _currentProjectId.asStateFlow()
 
-    // Tabs currently open in editor (clean empty files)
+    // Tabs currently open in editor (starts with exactly 1 starter file)
     private val _openTabIds = MutableStateFlow<List<String>>(
-        DefaultProjects.blankProject.files.map { it.id }
+        DefaultProjects.starterProject.files.map { it.id }
     )
     val openTabIds: StateFlow<List<String>> = _openTabIds.asStateFlow()
 
-    private val _activeFileId = MutableStateFlow(DefaultProjects.blankProject.activeFileId)
+    private val _activeFileId = MutableStateFlow(DefaultProjects.starterProject.activeFileId)
     val activeFileId: StateFlow<String> = _activeFileId.asStateFlow()
 
-    private val _editorSettings = MutableStateFlow(EditorSettings(themeId = "github_dark"))
+    private val _editorSettings = MutableStateFlow(EditorSettings(themeId = "github_dark", fontSizeSp = 12))
     val editorSettings: StateFlow<EditorSettings> = _editorSettings.asStateFlow()
 
-    // Separate Terminal 1: Bot & Code Execution Logs
+    // Separate Terminal 1: Code Execution Logs
     private val _executionLogs = MutableStateFlow<List<ConsoleEntry>>(emptyList())
     val executionLogs: StateFlow<List<ConsoleEntry>> = _executionLogs.asStateFlow()
 
@@ -59,16 +56,13 @@ class CodeStudioViewModel : ViewModel() {
     private val _pipTerminalLogs = MutableStateFlow<List<ConsoleEntry>>(
         listOf(
             ConsoleEntry(type = LogType.SYSTEM, text = "[PocketCode VirtualEnv] Python 3.11.8 environment active"),
-            ConsoleEntry(type = LogType.SYSTEM, text = "[Pip] Type 'pip install <package>' or browse libraries below.")
+            ConsoleEntry(type = LogType.SYSTEM, text = "[Pip] Run 'pip install <package>' or click quick tags to install libraries.")
         )
     )
     val pipTerminalLogs: StateFlow<List<ConsoleEntry>> = _pipTerminalLogs.asStateFlow()
 
     private val _isRunning = MutableStateFlow(false)
     val isRunning: StateFlow<Boolean> = _isRunning.asStateFlow()
-
-    private val _activeSimulator = MutableStateFlow<TelegramBotSimulator?>(null)
-    val activeSimulator: StateFlow<TelegramBotSimulator?> = _activeSimulator.asStateFlow()
 
     private val _activeSheet = MutableStateFlow<ActiveSheet?>(null)
     val activeSheet: StateFlow<ActiveSheet?> = _activeSheet.asStateFlow()
@@ -94,54 +88,21 @@ class CodeStudioViewModel : ViewModel() {
         _currentProjectId.value = projectId
         _activeFileId.value = proj.activeFileId
         _openTabIds.value = proj.files.take(4).map { it.id }
-        _activeSimulator.value = null
     }
 
     fun createProject(name: String, description: String, template: String) {
         val newProjId = "proj_" + UUID.randomUUID().toString().take(6)
         val mainFileId = "file_" + UUID.randomUUID().toString().take(6)
 
-        val files = when (template) {
-            "telegram" -> {
-                DefaultProjects.telegramBotProject.files.map {
-                    it.copy(id = "file_" + UUID.randomUUID().toString().take(6), projectId = newProjId)
-                }
-            }
-            "fastapi" -> {
-                DefaultProjects.fastApiProject.files.map {
-                    it.copy(id = "file_" + UUID.randomUUID().toString().take(6), projectId = newProjId)
-                }
-            }
-            "blank" -> {
-                // User asked for initially blank files
-                listOf(
-                    CodeFile(
-                        id = mainFileId,
-                        projectId = newProjId,
-                        name = "main.py",
-                        isEntrypoint = true,
-                        content = ""
-                    )
-                )
-            }
-            else -> {
-                listOf(
-                    CodeFile(
-                        id = mainFileId,
-                        projectId = newProjId,
-                        name = "main.py",
-                        isEntrypoint = true,
-                        content = ""
-                    ),
-                    CodeFile(
-                        id = "file_" + UUID.randomUUID().toString().take(6),
-                        projectId = newProjId,
-                        name = "utils.py",
-                        content = ""
-                    )
-                )
-            }
-        }
+        val files = listOf(
+            CodeFile(
+                id = mainFileId,
+                projectId = newProjId,
+                name = "main.py",
+                isEntrypoint = true,
+                content = "# $name\nprint('Hello from $name!')\n"
+            )
+        )
 
         val newProject = Project(
             id = newProjId,
@@ -149,7 +110,7 @@ class CodeStudioViewModel : ViewModel() {
             description = description,
             activeFileId = files.first().id,
             files = files,
-            installedPackages = if (template == "telegram") listOf("aiogram", "python-dotenv", "aiohttp") else emptyList()
+            installedPackages = emptyList()
         )
 
         _projects.update { it + newProject }
@@ -193,7 +154,7 @@ class CodeStudioViewModel : ViewModel() {
             id = newFileId,
             projectId = _currentProjectId.value,
             name = cleanName,
-            content = content, // empty by default as requested!
+            content = content,
             isEntrypoint = isEntrypoint
         )
 
@@ -246,27 +207,27 @@ class CodeStudioViewModel : ViewModel() {
             updateFileContent(fileToTarget.id, updated)
             openFile(fileToTarget.id)
             closeSheet()
-            addExecutionLog(LogType.SUCCESS, "✅ Сниппет вставлен в файл ${fileToTarget.name}")
+            addExecutionLog(LogType.SUCCESS, "✅ Сниппет добавлен в ${fileToTarget.name}")
         }
     }
 
-    // DEDICATED PIP INSTALLATION
+    // DEDICATED PIP PACKAGE INSTALLATION
     fun installPackage(packageName: String, version: String = "") {
         viewModelScope.launch {
             openSheet(ActiveSheet.PIP_TERMINAL)
             val cleanPkg = packageName.trim()
-            val ver = if (version.isNotEmpty()) version else "latest"
+            val ver = if (version.isNotEmpty()) version else "2.31.0"
 
             addPipLog(LogType.SYSTEM, "$ pip install $cleanPkg")
-            delay(100)
-            addPipLog(LogType.SYSTEM, "Collecting $cleanPkg ($ver)...")
-            delay(180)
-            addPipLog(LogType.SYSTEM, "Downloading $cleanPkg-whl (3.8 MB)")
-            addPipLog(LogType.SYSTEM, "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% [3.8/3.8 MB]")
-            delay(220)
-            addPipLog(LogType.SYSTEM, "Installing collected packages: $cleanPkg")
+            delay(80)
+            addPipLog(LogType.SYSTEM, "Collecting $cleanPkg ($ver)")
+            delay(120)
+            addPipLog(LogType.SYSTEM, "  Downloading $cleanPkg-$ver-py3-none-any.whl (1.4 MB)")
+            addPipLog(LogType.SYSTEM, "  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 1.4/1.4 MB")
             delay(150)
-            addPipLog(LogType.SUCCESS, "Successfully installed $cleanPkg-$ver in virtualenv (/env/lib/python3.11/site-packages)")
+            addPipLog(LogType.SYSTEM, "Installing collected packages: $cleanPkg")
+            delay(100)
+            addPipLog(LogType.SUCCESS, "Successfully installed $cleanPkg-$ver")
 
             // 1. Update project installedPackages list
             _projects.update { list ->
@@ -277,7 +238,7 @@ class CodeStudioViewModel : ViewModel() {
                 }
             }
 
-            // 2. Update requirements.txt
+            // 2. Update requirements.txt if present
             val lineToAdd = if (version.isNotEmpty()) "$cleanPkg==$version" else cleanPkg
             val reqFile = currentProject.files.find { it.isRequirements }
             if (reqFile != null) {
@@ -285,8 +246,6 @@ class CodeStudioViewModel : ViewModel() {
                     val updatedContent = if (reqFile.content.isEmpty()) lineToAdd + "\n" else reqFile.content.trimEnd() + "\n" + lineToAdd + "\n"
                     updateFileContent(reqFile.id, updatedContent)
                 }
-            } else {
-                createFile("requirements.txt", lineToAdd + "\n")
             }
         }
     }
@@ -295,7 +254,7 @@ class CodeStudioViewModel : ViewModel() {
         viewModelScope.launch {
             openSheet(ActiveSheet.PIP_TERMINAL)
             addPipLog(LogType.SYSTEM, "$ pip uninstall -y $packageName")
-            delay(120)
+            delay(80)
             addPipLog(LogType.SUCCESS, "Successfully uninstalled $packageName")
 
             _projects.update { list ->
@@ -318,7 +277,7 @@ class CodeStudioViewModel : ViewModel() {
         val trimmed = command.trim()
         viewModelScope.launch {
             addPipLog(LogType.SYSTEM, "$ $trimmed")
-            delay(100)
+            delay(80)
             when {
                 trimmed.startsWith("pip install ") -> {
                     val pkg = trimmed.removePrefix("pip install ").trim()
@@ -327,8 +286,12 @@ class CodeStudioViewModel : ViewModel() {
                 trimmed == "pip list" || trimmed == "pip freeze" -> {
                     addPipLog(LogType.STDOUT, "Package            Version")
                     addPipLog(LogType.STDOUT, "------------------ -------")
-                    currentProject.installedPackages.forEach { pkg ->
-                        addPipLog(LogType.STDOUT, String.format("%-18s %s", pkg, "1.0.0"))
+                    if (currentProject.installedPackages.isEmpty()) {
+                        addPipLog(LogType.SYSTEM, "(virtualenv is clean, no packages installed)")
+                    } else {
+                        currentProject.installedPackages.forEach { pkg ->
+                            addPipLog(LogType.STDOUT, String.format("%-18s %s", pkg, "1.0.0"))
+                        }
                     }
                 }
                 trimmed == "pip --version" -> {
@@ -336,8 +299,8 @@ class CodeStudioViewModel : ViewModel() {
                 }
                 else -> {
                     addPipLog(LogType.SYSTEM, "Running: $trimmed")
-                    delay(150)
-                    addPipLog(LogType.SUCCESS, "Command completed successfully.")
+                    delay(100)
+                    addPipLog(LogType.SUCCESS, "Command completed.")
                 }
             }
         }
@@ -359,9 +322,6 @@ class CodeStudioViewModel : ViewModel() {
                 project = currentProject,
                 onLog = { entry ->
                     _executionLogs.update { it + entry }
-                },
-                onBotSimulatorReady = { sim ->
-                    _activeSimulator.value = sim
                 }
             )
             _isRunning.value = false
@@ -370,25 +330,7 @@ class CodeStudioViewModel : ViewModel() {
 
     fun stopProject() {
         _isRunning.value = false
-        addExecutionLog(LogType.SYSTEM, "⏹ Process terminated by user.")
-    }
-
-    fun sendBotMessage(text: String) {
-        val sim = _activeSimulator.value ?: return
-        viewModelScope.launch {
-            sim.handleUserMessage(text) { log ->
-                _executionLogs.update { it + log }
-            }
-        }
-    }
-
-    fun sendBotCallback(callbackData: String) {
-        val sim = _activeSimulator.value ?: return
-        viewModelScope.launch {
-            sim.handleCallbackClick(callbackData) { log ->
-                _executionLogs.update { it + log }
-            }
-        }
+        addExecutionLog(LogType.SYSTEM, "⏹ Process stopped by user.")
     }
 
     fun clearExecutionLogs() {
@@ -402,7 +344,7 @@ class CodeStudioViewModel : ViewModel() {
     fun addGitHubWorkflowToProject() {
         val workflow = GitHubActionsHub.androidApkWorkflow
         createFile(workflow.fileName, workflow.ymlContent)
-        addExecutionLog(LogType.SUCCESS, "✅ Файл воркфлоу ${workflow.fileName} добавлен в проект!")
+        addExecutionLog(LogType.SUCCESS, "✅ Файл ${workflow.fileName} добавлен в проект!")
     }
 
     fun addExecutionLog(type: LogType, text: String) {

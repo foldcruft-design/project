@@ -57,7 +57,6 @@ fun CodeEditorScreen(
     val executionLogs by viewModel.executionLogs.collectAsState()
     val pipLogs by viewModel.pipTerminalLogs.collectAsState()
     val isRunning by viewModel.isRunning.collectAsState()
-    val activeSimulator by viewModel.activeSimulator.collectAsState()
     val activeSheet by viewModel.activeSheet.collectAsState()
 
     val currentTheme = SyntaxThemes.getById(settings.themeId)
@@ -77,49 +76,48 @@ fun CodeEditorScreen(
     Scaffold(
         topBar = {
             Column(modifier = Modifier.background(GitHubDarkSurface)) {
-                // GITHUB REPO & BREADCRUMBS BAR
+                // COMPACT REPO & BREADCRUMBS BAR
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .statusBarsPadding()
-                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                        .padding(horizontal = 10.dp, vertical = 4.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        horizontalArrangement = Arrangement.spacedBy(5.dp),
                         modifier = Modifier
                             .clickable { viewModel.openSheet(ActiveSheet.FILE_EXPLORER) }
                             .testTag("topbar_project_chip")
                     ) {
-                        // GitHub Octocat / Branch pill
                         Surface(
                             color = GitHubDarkCard,
-                            shape = RoundedCornerShape(12.dp),
+                            shape = RoundedCornerShape(10.dp),
                             border = androidx.compose.foundation.BorderStroke(1.dp, GitHubDarkBorder)
                         ) {
                             Row(
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                horizontalArrangement = Arrangement.spacedBy(3.dp)
                             ) {
-                                Icon(Icons.Default.ForkRight, contentDescription = null, tint = TextSecondary, modifier = Modifier.size(12.dp))
-                                Text("main", color = TextSecondary, fontSize = 11.sp, fontFamily = FontFamily.Monospace)
+                                Icon(Icons.Default.ForkRight, contentDescription = null, tint = TextSecondary, modifier = Modifier.size(11.dp))
+                                Text("main", color = TextSecondary, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
                             }
                         }
 
-                        Text("/", color = TextMuted, fontSize = 13.sp)
+                        Text("/", color = TextMuted, fontSize = 11.sp)
 
                         Text(
                             currentProject.name,
                             color = TextPrimary,
                             fontWeight = FontWeight.Bold,
-                            fontSize = 13.sp,
+                            fontSize = 11.5.sp,
                             maxLines = 1
                         )
 
-                        Text("/", color = TextMuted, fontSize = 13.sp)
+                        Text("/", color = TextMuted, fontSize = 11.sp)
 
                         if (activeFile != null) {
                             FileLanguageIcon(activeFile.name)
@@ -127,19 +125,25 @@ fun CodeEditorScreen(
                                 activeFile.name,
                                 color = TextPrimary,
                                 fontFamily = FontFamily.Monospace,
-                                fontSize = 12.sp,
+                                fontSize = 11.5.sp,
                                 fontWeight = FontWeight.SemiBold
                             )
                         }
                     }
 
-                    // Top Action Icons (GitHub Raw / Settings / Menu)
+                    // Compact Top Actions
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        IconButton(onClick = { viewModel.openSheet(ActiveSheet.FILE_EXPLORER) }) {
-                            Icon(Icons.Default.Folder, contentDescription = "Файлы", tint = TextSecondary, modifier = Modifier.size(18.dp))
+                        IconButton(
+                            onClick = { viewModel.openSheet(ActiveSheet.FILE_EXPLORER) },
+                            modifier = Modifier.size(28.dp)
+                        ) {
+                            Icon(Icons.Default.Folder, contentDescription = "Файлы", tint = TextSecondary, modifier = Modifier.size(16.dp))
                         }
-                        IconButton(onClick = { showMenu = true }, modifier = Modifier.testTag("overflow_menu_btn")) {
-                            Icon(Icons.Default.MoreVert, contentDescription = "Меню", tint = TextSecondary, modifier = Modifier.size(18.dp))
+                        IconButton(
+                            onClick = { showMenu = true },
+                            modifier = Modifier.size(28.dp).testTag("overflow_menu_btn")
+                        ) {
+                            Icon(Icons.Default.MoreVert, contentDescription = "Меню", tint = TextSecondary, modifier = Modifier.size(16.dp))
                         }
 
                         DropdownMenu(
@@ -150,61 +154,61 @@ fun CodeEditorScreen(
                                 .border(1.dp, GitHubDarkBorder, RoundedCornerShape(8.dp))
                         ) {
                             DropdownMenuItem(
-                                text = { Text("📦 Терминал Pip (Библиотеки)", color = TextPrimary, fontSize = 13.sp) },
+                                text = { Text("📦 Терминал Pip (Библиотеки)", color = TextPrimary, fontSize = 12.sp) },
                                 onClick = {
                                     showMenu = false
                                     viewModel.openSheet(ActiveSheet.PIP_TERMINAL)
                                 },
-                                leadingIcon = { Icon(Icons.Default.Extension, contentDescription = null, tint = TextSecondary) }
+                                leadingIcon = { Icon(Icons.Default.Extension, contentDescription = null, tint = TextSecondary, modifier = Modifier.size(16.dp)) }
                             )
                             DropdownMenuItem(
-                                text = { Text("⚡ Терминал Выполнения (Бот)", color = TextPrimary, fontSize = 13.sp) },
+                                text = { Text("⚡ Терминал Выполнения", color = TextPrimary, fontSize = 12.sp) },
                                 onClick = {
                                     showMenu = false
                                     viewModel.openSheet(ActiveSheet.EXECUTION_TERMINAL)
                                 },
-                                leadingIcon = { Icon(Icons.Default.Terminal, contentDescription = null, tint = TextSecondary) }
+                                leadingIcon = { Icon(Icons.Default.Terminal, contentDescription = null, tint = TextSecondary, modifier = Modifier.size(16.dp)) }
                             )
                             DropdownMenuItem(
-                                text = { Text("🚀 GitHub Actions (.yml)", color = TextPrimary, fontSize = 13.sp) },
+                                text = { Text("🚀 GitHub Actions (.yml)", color = TextPrimary, fontSize = 12.sp) },
                                 onClick = {
                                     showMenu = false
                                     viewModel.openSheet(ActiveSheet.GITHUB_ACTIONS)
                                 },
-                                leadingIcon = { Icon(Icons.Default.CloudSync, contentDescription = null, tint = TextSecondary) }
+                                leadingIcon = { Icon(Icons.Default.CloudSync, contentDescription = null, tint = TextSecondary, modifier = Modifier.size(16.dp)) }
                             )
                             DropdownMenuItem(
-                                text = { Text("🎨 Стили синтаксиса", color = TextPrimary, fontSize = 13.sp) },
+                                text = { Text("🎨 Стили синтаксиса", color = TextPrimary, fontSize = 12.sp) },
                                 onClick = {
                                     showMenu = false
                                     viewModel.openSheet(ActiveSheet.THEMES)
                                 },
-                                leadingIcon = { Icon(Icons.Default.FormatPaint, contentDescription = null, tint = TextSecondary) }
+                                leadingIcon = { Icon(Icons.Default.FormatPaint, contentDescription = null, tint = TextSecondary, modifier = Modifier.size(16.dp)) }
                             )
                             HorizontalDivider(color = GitHubDarkBorder)
                             DropdownMenuItem(
-                                text = { Text("+ Создать файл (пустой)", color = TextPrimary, fontWeight = FontWeight.SemiBold, fontSize = 13.sp) },
+                                text = { Text("+ Создать файл", color = TextPrimary, fontWeight = FontWeight.SemiBold, fontSize = 12.sp) },
                                 onClick = {
                                     showMenu = false
                                     viewModel.openSheet(ActiveSheet.CREATE_FILE_DIALOG)
                                 },
-                                leadingIcon = { Icon(Icons.Default.NoteAdd, contentDescription = null, tint = TextPrimary) }
+                                leadingIcon = { Icon(Icons.Default.NoteAdd, contentDescription = null, tint = TextPrimary, modifier = Modifier.size(16.dp)) }
                             )
                             DropdownMenuItem(
-                                text = { Text("+ Создать проект", color = TextSecondary, fontSize = 13.sp) },
+                                text = { Text("+ Новый проект", color = TextSecondary, fontSize = 12.sp) },
                                 onClick = {
                                     showMenu = false
                                     viewModel.openSheet(ActiveSheet.CREATE_PROJECT_DIALOG)
                                 },
-                                leadingIcon = { Icon(Icons.Default.CreateNewFolder, contentDescription = null, tint = TextSecondary) }
+                                leadingIcon = { Icon(Icons.Default.CreateNewFolder, contentDescription = null, tint = TextSecondary, modifier = Modifier.size(16.dp)) }
                             )
                         }
                     }
                 }
 
-                HorizontalDivider(color = GitHubDarkBorder)
+                HorizontalDivider(color = GitHubDarkBorder, thickness = 0.5.dp)
 
-                // GITHUB MULTI-FILE TABS
+                // COMPACT TABS
                 MultiFileTabBar(
                     project = currentProject,
                     openTabIds = openTabIds,
@@ -217,7 +221,7 @@ fun CodeEditorScreen(
         },
         bottomBar = {
             Column(modifier = Modifier.background(GitHubDarkSurface)) {
-                // MOBILE CODING ACCESSORY BAR
+                // COMPACT MOBILE CODING ACCESSORY BAR
                 MobileCodingToolbar(
                     onInsertSymbol = { symbol ->
                         val currentText = textFieldValue.text
@@ -242,78 +246,75 @@ fun CodeEditorScreen(
                     }
                 )
 
-                HorizontalDivider(color = GitHubDarkBorder)
+                HorizontalDivider(color = GitHubDarkBorder, thickness = 0.5.dp)
 
-                // BOTTOM STATUS BAR & NAVIGATION ROW
+                // COMPACT BOTTOM STATUS BAR & NAVIGATION ROW
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .navigationBarsPadding()
-                        .padding(horizontal = 12.dp, vertical = 6.dp),
+                        .padding(horizontal = 10.dp, vertical = 4.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         if (activeFile != null) {
                             FileLanguageIcon(activeFile.name)
                             Text(
                                 "${textFieldValue.text.lines().size} строк • ${textFieldValue.text.length} B",
                                 color = TextMuted,
-                                fontSize = 11.sp,
+                                fontSize = 10.sp,
                                 fontFamily = FontFamily.Monospace
                             )
                         }
                     }
 
-                    // Bottom Navigation Buttons
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        // Dedicated Pip Terminal button
+                    // Compact Navigation Pills
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                         Surface(
-                            shape = RoundedCornerShape(6.dp),
+                            shape = RoundedCornerShape(4.dp),
                             color = GitHubDarkCard,
                             border = androidx.compose.foundation.BorderStroke(1.dp, GitHubDarkBorder),
                             modifier = Modifier.clickable { viewModel.openSheet(ActiveSheet.PIP_TERMINAL) }
                         ) {
                             Row(
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                horizontalArrangement = Arrangement.spacedBy(3.dp)
                             ) {
-                                Text("📦 pip", fontSize = 11.sp, color = TextSecondary, fontFamily = FontFamily.Monospace)
+                                Text("📦 pip", fontSize = 10.5.sp, color = TextSecondary, fontFamily = FontFamily.Monospace)
                             }
                         }
 
-                        // Execution Terminal button
                         Surface(
-                            shape = RoundedCornerShape(6.dp),
+                            shape = RoundedCornerShape(4.dp),
                             color = GitHubDarkCard,
                             border = androidx.compose.foundation.BorderStroke(1.dp, GitHubDarkBorder),
                             modifier = Modifier.clickable { viewModel.openSheet(ActiveSheet.EXECUTION_TERMINAL) }
                         ) {
                             Row(
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                horizontalArrangement = Arrangement.spacedBy(3.dp)
                             ) {
-                                Icon(Icons.Default.Terminal, contentDescription = null, tint = TextSecondary, modifier = Modifier.size(12.dp))
-                                Text("Терминал", fontSize = 11.sp, color = TextSecondary)
+                                Icon(Icons.Default.Terminal, contentDescription = null, tint = TextSecondary, modifier = Modifier.size(11.dp))
+                                Text("Терминал", fontSize = 10.5.sp, color = TextSecondary)
                             }
                         }
 
-                        // Snippet Cards
                         Surface(
-                            shape = RoundedCornerShape(6.dp),
+                            shape = RoundedCornerShape(4.dp),
                             color = GitHubDarkCard,
                             border = androidx.compose.foundation.BorderStroke(1.dp, GitHubDarkBorder),
                             modifier = Modifier.clickable { viewModel.openSheet(ActiveSheet.SNIPPETS) }
                         ) {
                             Row(
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                horizontalArrangement = Arrangement.spacedBy(3.dp)
                             ) {
-                                Icon(Icons.Default.Layers, contentDescription = null, tint = TextSecondary, modifier = Modifier.size(12.dp))
-                                Text("Карточки", fontSize = 11.sp, color = TextSecondary)
+                                Icon(Icons.Default.Layers, contentDescription = null, tint = TextSecondary, modifier = Modifier.size(11.dp))
+                                Text("Карточки", fontSize = 10.5.sp, color = TextSecondary)
                             }
                         }
                     }
@@ -330,29 +331,28 @@ fun CodeEditorScreen(
             // GITHUB CODE EDITOR CANVAS
             if (activeFile != null) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxSize()
+                    modifier = Modifier.fillMaxSize()
                 ) {
-                    // Line numbers gutter (GitHub Dark)
+                    // Compact Line numbers gutter
                     if (settings.showLineNumbers) {
                         val lineCount = remember(textFieldValue.text) { textFieldValue.text.lines().size }
 
                         Column(
                             modifier = Modifier
-                                .width(38.dp)
+                                .width(30.dp)
                                 .fillMaxHeight()
                                 .background(GitHubDarkSurface)
                                 .border(width = 0.5.dp, color = GitHubDarkBorder)
-                                .padding(vertical = 10.dp),
+                                .padding(vertical = 6.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             for (i in 1..lineCount) {
                                 Text(
                                     text = "$i",
                                     color = currentTheme.lineNumbersColor,
-                                    fontSize = (settings.fontSizeSp - 2).sp,
+                                    fontSize = 10.sp,
                                     fontFamily = FontFamily.Monospace,
-                                    lineHeight = (settings.fontSizeSp * 1.5f).sp
+                                    lineHeight = 17.sp
                                 )
                             }
                         }
@@ -364,7 +364,7 @@ fun CodeEditorScreen(
                             .weight(1f)
                             .fillMaxHeight()
                             .background(currentTheme.editorBackground)
-                            .padding(horizontal = 12.dp, vertical = 10.dp)
+                            .padding(horizontal = 8.dp, vertical = 6.dp)
                     ) {
                         BasicTextField(
                             value = textFieldValue,
@@ -374,9 +374,9 @@ fun CodeEditorScreen(
                             },
                             textStyle = TextStyle(
                                 fontFamily = FontFamily.Monospace,
-                                fontSize = settings.fontSizeSp.sp,
+                                fontSize = 12.sp,
                                 color = currentTheme.variableColor,
-                                lineHeight = (settings.fontSizeSp * 1.5f).sp
+                                lineHeight = 17.sp
                             ),
                             cursorBrush = SolidColor(currentTheme.cursorColor),
                             modifier = Modifier
@@ -398,22 +398,22 @@ fun CodeEditorScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(Icons.Default.NoteAdd, contentDescription = null, tint = TextMuted, modifier = Modifier.size(48.dp))
+                        Icon(Icons.Default.NoteAdd, contentDescription = null, tint = TextMuted, modifier = Modifier.size(36.dp))
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text("Нет открытых файлов", color = TextSecondary, fontSize = 12.sp)
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text("Нет открытых файлов", color = TextSecondary)
-                        Spacer(modifier = Modifier.height(12.dp))
                         Button(
                             onClick = { viewModel.openSheet(ActiveSheet.FILE_EXPLORER) },
                             colors = ButtonDefaults.buttonColors(containerColor = GitHubDarkCard, contentColor = TextPrimary),
                             border = androidx.compose.foundation.BorderStroke(1.dp, GitHubDarkBorder)
                         ) {
-                            Text("Открыть проводник файлов")
+                            Text("Открыть проводник файлов", fontSize = 12.sp)
                         }
                     }
                 }
             }
 
-            // GLASSMORPHISM FLOATING RUN BUTTON AT BOTTOM RIGHT
+            // REDESIGNED SLEEK GLASSMORPHIC RUN BUTTON AT BOTTOM RIGHT
             GlassmorphicRunButton(
                 isRunning = isRunning,
                 onClick = {
@@ -421,7 +421,7 @@ fun CodeEditorScreen(
                 },
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(end = 16.dp, bottom = 16.dp)
+                    .padding(end = 12.dp, bottom = 12.dp)
                     .testTag("run_project_btn")
             )
         }
@@ -429,16 +429,13 @@ fun CodeEditorScreen(
 
     // SHEETS & DIALOGS
     when (activeSheet) {
-        ActiveSheet.EXECUTION_TERMINAL, ActiveSheet.BOT_SIMULATOR -> {
+        ActiveSheet.EXECUTION_TERMINAL -> {
             ExecutionTerminalSheet(
                 logs = executionLogs,
                 isRunning = isRunning,
-                simulator = activeSimulator,
                 onRunProject = { viewModel.runProject() },
                 onStopProject = { viewModel.stopProject() },
                 onClearLogs = { viewModel.clearExecutionLogs() },
-                onSendBotMessage = { viewModel.sendBotMessage(it) },
-                onSendBotCallback = { viewModel.sendBotCallback(it) },
                 onDismiss = { viewModel.closeSheet() }
             )
         }
@@ -511,7 +508,7 @@ fun CodeEditorScreen(
     }
 }
 
-// GLASSMORPHISM RUN BUTTON AT THE BOTTOM
+// REDESIGNED COMPACT GLASSMORPHIC DEVELOPER RUN BUTTON
 @Composable
 fun GlassmorphicRunButton(
     isRunning: Boolean,
@@ -520,59 +517,62 @@ fun GlassmorphicRunButton(
 ) {
     Surface(
         onClick = onClick,
-        shape = RoundedCornerShape(24.dp),
-        color = GlassBackgroundElevated,
+        shape = RoundedCornerShape(20.dp),
+        color = Color(0xF0161B22),
         border = androidx.compose.foundation.BorderStroke(
-            1.2.dp,
-            Brush.verticalGradient(
-                colors = listOf(
-                    Color.White.copy(alpha = 0.45f),
-                    Color.White.copy(alpha = 0.12f)
+            1.dp,
+            Brush.horizontalGradient(
+                colors = if (isRunning) listOf(
+                    Color(0xFFD29922).copy(alpha = 0.8f),
+                    Color(0xFF8B5CF6).copy(alpha = 0.4f)
+                ) else listOf(
+                    Color(0xFF238636).copy(alpha = 0.9f),
+                    Color(0xFF2EA043).copy(alpha = 0.6f)
                 )
             )
         ),
-        shadowElevation = 8.dp,
+        shadowElevation = 6.dp,
         modifier = modifier
-            .height(46.dp)
-            .shadow(12.dp, RoundedCornerShape(24.dp), ambientColor = Color.Black, spotColor = Color.Black)
+            .height(36.dp)
+            .shadow(8.dp, RoundedCornerShape(20.dp), ambientColor = Color.Black, spotColor = Color.Black)
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             if (isRunning) {
                 CircularProgressIndicator(
-                    modifier = Modifier.size(16.dp),
-                    strokeWidth = 2.dp,
+                    modifier = Modifier.size(13.dp),
+                    strokeWidth = 1.8.dp,
                     color = Color(0xFFD29922)
                 )
                 Text(
-                    "Остановить",
+                    "Стоп",
                     color = TextPrimary,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 13.sp
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 11.5.sp
                 )
             } else {
                 Surface(
-                    color = Color(0xFF3FB950).copy(alpha = 0.25f),
+                    color = Color(0xFF238636).copy(alpha = 0.35f),
                     shape = CircleShape,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(20.dp)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             Icons.Default.PlayArrow,
                             contentDescription = null,
                             tint = Color(0xFF3FB950),
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(13.dp)
                         )
                     }
                 }
                 Text(
-                    "Запустить",
+                    "Запуск",
                     color = TextPrimary,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 13.sp
+                    fontSize = 11.5.sp
                 )
             }
         }
@@ -592,7 +592,7 @@ fun MultiFileTabBar(
         modifier = Modifier
             .fillMaxWidth()
             .background(GitHubDarkSurface)
-            .padding(horizontal = 4.dp, vertical = 2.dp),
+            .padding(horizontal = 4.dp, vertical = 1.dp),
         horizontalArrangement = Arrangement.spacedBy(2.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -602,26 +602,26 @@ fun MultiFileTabBar(
                 val isActive = file.id == activeFileId
 
                 Surface(
-                    shape = RoundedCornerShape(topStart = 6.dp, topEnd = 6.dp),
+                    shape = RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp),
                     color = if (isActive) GitHubDarkBg else Color.Transparent,
                     border = if (isActive) androidx.compose.foundation.BorderStroke(1.dp, GitHubDarkBorder) else null,
                     modifier = Modifier.clickable { onSelectTab(file.id) }
                 ) {
                     Row(
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         FileLanguageIcon(file.name)
                         Text(
                             text = file.name,
-                            fontSize = 12.sp,
+                            fontSize = 11.sp,
                             fontFamily = FontFamily.Monospace,
                             fontWeight = if (isActive) FontWeight.SemiBold else FontWeight.Normal,
                             color = if (isActive) TextPrimary else TextSecondary
                         )
                         if (file.isEntrypoint) {
-                            Text("★", fontSize = 10.sp, color = TextMuted)
+                            Text("★", fontSize = 9.sp, color = TextMuted)
                         }
                         if (openTabIds.size > 1) {
                             Icon(
@@ -629,7 +629,7 @@ fun MultiFileTabBar(
                                 contentDescription = "Закрыть",
                                 tint = TextMuted,
                                 modifier = Modifier
-                                    .size(14.dp)
+                                    .size(12.dp)
                                     .clickable { onCloseTab(file.id) }
                             )
                         }
@@ -641,9 +641,9 @@ fun MultiFileTabBar(
         item {
             IconButton(
                 onClick = onAddNewFile,
-                modifier = Modifier.size(28.dp).testTag("tabbar_add_file_btn")
+                modifier = Modifier.size(24.dp).testTag("tabbar_add_file_btn")
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Добавить файл", tint = TextSecondary, modifier = Modifier.size(16.dp))
+                Icon(Icons.Default.Add, contentDescription = "Добавить файл", tint = TextSecondary, modifier = Modifier.size(14.dp))
             }
         }
     }
@@ -656,20 +656,20 @@ fun MobileCodingToolbar(
 ) {
     val quickSymbols = listOf(
         ":", "(", ")", "[", "]", "{", "}", "\"", "'", "=",
-        "_", "->", "@", "#", "def ", "class ", "import ", "async ", "await ", "return "
+        "_", "->", "@", "#", "def ", "import ", "return ", "for ", "in ", "if "
     )
 
     LazyRow(
         modifier = Modifier
             .fillMaxWidth()
             .background(GitHubDarkCard)
-            .padding(horizontal = 6.dp, vertical = 4.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
+            .padding(horizontal = 4.dp, vertical = 2.dp),
+        horizontalArrangement = Arrangement.spacedBy(3.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         item {
             Surface(
-                shape = RoundedCornerShape(6.dp),
+                shape = RoundedCornerShape(4.dp),
                 color = GitHubDarkSurface,
                 border = androidx.compose.foundation.BorderStroke(1.dp, GitHubDarkBorder),
                 modifier = Modifier.clickable { onTabIndent() }
@@ -678,16 +678,16 @@ fun MobileCodingToolbar(
                     "Tab ⇥",
                     color = TextPrimary,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 12.sp,
+                    fontSize = 10.5.sp,
                     fontFamily = FontFamily.Monospace,
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp)
+                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
                 )
             }
         }
 
         items(quickSymbols) { symbol ->
             Surface(
-                shape = RoundedCornerShape(6.dp),
+                shape = RoundedCornerShape(4.dp),
                 color = GitHubDarkBg,
                 border = androidx.compose.foundation.BorderStroke(1.dp, GitHubDarkBorder),
                 modifier = Modifier.clickable { onInsertSymbol(symbol) }
@@ -695,9 +695,9 @@ fun MobileCodingToolbar(
                 Text(
                     symbol.trim(),
                     color = TextPrimary,
-                    fontSize = 13.sp,
+                    fontSize = 11.sp,
                     fontFamily = FontFamily.Monospace,
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
                 )
             }
         }
