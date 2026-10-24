@@ -191,8 +191,17 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Prepare Debug Keystore
+        run: |
+          if [ -f debug.keystore.base64 ]; then
+            base64 -d debug.keystore.base64 > debug.keystore
+          fi
+          if [ ! -f debug.keystore ]; then
+            keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+          fi
+
       - name: Build Debug APK with Gradle
-        run: ./gradlew assembleDebug --no-daemon --stacktrace
+        run: ./gradlew assembleDebug --no-daemon --stacktrace -Djava.awt.headless=true
 
       - name: Upload Debug APK Artifact
         uses: actions/upload-artifact@v4
